@@ -69,6 +69,15 @@
   <ItemGroup>
     <ClCompile Include="Source.cpp" />
   </ItemGroup>
+  <ItemGroup>
+    <Image Include="00.gif" />
+    <Image Include="01.gif" />
+    <Image Include="02.gif" />
+    <Image Include="03.gif" />
+    <Image Include="04.gif" />
+    <Image Include="05.gif" />
+    <Image Include="splash.jpg" />
+  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>

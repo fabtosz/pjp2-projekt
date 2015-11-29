@@ -19,4 +19,27 @@
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
+  <ItemGroup>
+    <Image Include="00.gif">
+      <Filter>Source Files</Filter>
+    </Image>
+    <Image Include="01.gif">
+      <Filter>Source Files</Filter>
+    </Image>
+    <Image Include="02.gif">
+      <Filter>Source Files</Filter>
+    </Image>
+    <Image Include="03.gif">
+      <Filter>Source Files</Filter>
+    </Image>
+    <Image Include="04.gif">
+      <Filter>Source Files</Filter>
+    </Image>
+    <Image Include="05.gif">
+      <Filter>Source Files</Filter>
+    </Image>
+    <Image Include="splash.jpg">
+      <Filter>Source Files</Filter>
+    </Image>
+  </ItemGroup>
 </Project>
