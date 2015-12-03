@@ -44,7 +44,7 @@
     <Image Include="clouds.png">
       <Filter>Source Files</Filter>
     </Image>
-    <Image Include="tiles.png">
+    <Image Include="tiles.gif">
       <Filter>Source Files</Filter>
     </Image>
   </ItemGroup>

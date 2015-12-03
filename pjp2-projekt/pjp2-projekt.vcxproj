@@ -78,7 +78,7 @@
     <Image Include="05.gif" />
     <Image Include="clouds.png" />
     <Image Include="splash.jpg" />
-    <Image Include="tiles.png" />
+    <Image Include="tiles.gif" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
