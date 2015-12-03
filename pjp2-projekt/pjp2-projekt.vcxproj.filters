@@ -41,5 +41,11 @@
     <Image Include="splash.jpg">
       <Filter>Source Files</Filter>
     </Image>
+    <Image Include="clouds.png">
+      <Filter>Source Files</Filter>
+    </Image>
+    <Image Include="tiles.png">
+      <Filter>Source Files</Filter>
+    </Image>
   </ItemGroup>
 </Project>
