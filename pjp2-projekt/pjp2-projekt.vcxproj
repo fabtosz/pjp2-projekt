@@ -80,6 +80,9 @@
     <Image Include="splash.jpg" />
     <Image Include="tiles.gif" />
   </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="objects.h" />
+  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>
