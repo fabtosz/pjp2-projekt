@@ -17,8 +17,7 @@ enum KEYS{ UP, DOWN, LEFT, RIGHT };
 
 //ogólne sprawdzenie kolizji
 //sprawdza czy dwa prostok¹ty na siebie nachodz¹
-bool isCollide(float pos1_x, float pos1_y, float size1_x, float size1_y,
-	float pos2_x, float pos2_y, float size2_x, float size2_y)
+bool isCollide(float pos1_x, float pos1_y, float size1_x, float size1_y, float pos2_x, float pos2_y, float size2_x, float size2_y)
 {
 	float sr1_x = pos1_x + size1_x / 2;
 	float sr1_y = pos1_y + size1_y / 2;
@@ -215,7 +214,15 @@ int main(void)
 				}
 			}
 
-			if (keys[DOWN])
+			if (keys[UP])
+			{
+				if (canItMove(player.x, player.y, 0, -5))
+				{
+					player.y -= 10;
+				}
+			}
+
+			if (!keys[DOWN])
 			{
 				if (canItMove(player.x, player.y, 0, 5))
 				{
@@ -223,13 +230,8 @@ int main(void)
 				}
 			}
 
-			if (keys[UP])
-			{
-				if (canItMove(player.x, player.y, 0, -5))
-				{
-					player.y -= 5;
-				}
-			}
+
+			
 
 			//przeliczenie wspó³rzêdnych mapy
 			//gracz z prawej
@@ -272,6 +274,7 @@ int main(void)
 
 	for (int i = 0; i < maxFrame; i++)
 		al_destroy_bitmap(sprite[i]);
+
 	al_destroy_bitmap(bgClouds);
 	al_destroy_bitmap(bgTiles);
 	al_destroy_event_queue(event_queue);
