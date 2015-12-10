@@ -255,7 +255,7 @@ int main(void)
 			render = false;
 
 			//rysuj tlo
-			al_draw_bitmap(bgClouds, 0, 0, 0);
+			al_draw_bitmap(bgClouds, 0 + xOff/4, 0, 0);
 
 			//rysuj bloczki
 			for (int i = 0; i < sizeArrayMap; i++)
