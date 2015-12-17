@@ -47,6 +47,24 @@
     <Image Include="tiles.gif">
       <Filter>Source Files</Filter>
     </Image>
+    <Image Include="monster00.gif">
+      <Filter>Source Files</Filter>
+    </Image>
+    <Image Include="monster01.gif">
+      <Filter>Source Files</Filter>
+    </Image>
+    <Image Include="monster02.gif">
+      <Filter>Source Files</Filter>
+    </Image>
+    <Image Include="monster03.gif">
+      <Filter>Source Files</Filter>
+    </Image>
+    <Image Include="monster04.gif">
+      <Filter>Source Files</Filter>
+    </Image>
+    <Image Include="monster05.gif">
+      <Filter>Source Files</Filter>
+    </Image>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="objects.h">

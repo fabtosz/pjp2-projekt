@@ -6,7 +6,6 @@
 #include "objects.h"
 #include <math.h>
 
-#include <iostream>
 using namespace std;
 
 const int WIDTH = 600;
@@ -16,23 +15,18 @@ bool keys[] = { false, false, false, false };
 enum KEYS{ UP, DOWN, LEFT, RIGHT };
 
 //ogólne sprawdzenie kolizji
-//sprawdza czy dwa prostok¹ty na siebie nachodz¹
 bool isCollide(float pos1_x, float pos1_y, float size1_x, float size1_y, float pos2_x, float pos2_y, float size2_x, float size2_y)
 {
-	float sr1_x = pos1_x + size1_x / 2;
-	float sr1_y = pos1_y + size1_y / 2;
-
-	float sr2_x = pos2_x + size2_x / 2;
-	float sr2_y = pos2_y + size2_y / 2;
-
-	if (
-		abs(sr1_x - sr2_x) < abs((size1_x + size2_x) / 2) &&
-		abs(sr1_y - sr2_y) < abs((size1_y + size2_y) / 2)
-		)
-		return true;
-
-	return false;
-
+	if ((pos1_x > pos2_x + size2_x - 1) || // is b1 on the right side of b2?
+		(pos1_y > pos2_y + size2_y - 1) || // is b1 under b2?
+		(pos2_x > pos1_x + size1_x - 1) || // is b2 on the right side of b1?
+		(pos2_y > pos1_y + size1_y - 1))   // is b2 under b1?
+	{
+		// brak kolizji
+		return 0;
+	}
+	// jest kolizja
+	return 1;
 }
 
 // Sprawdzenie kolizji gracza z bloczkiem
@@ -42,8 +36,7 @@ bool isCollidePlayerTile(float player_x, float player_y, float tile_x, float til
 	return isCollide(player_x, player_y, playerSizeX, playerSizeY, tile_x, tile_y, tileSize, tileSize);
 }
 
-bool canItMove(float player_x, float player_y,  // wspó³rzêdne gracza
-	float x, float y)				        // o ile ruszyæ
+bool canItMove(float player_x, float player_y,  /* wspó³rzêdne gracza */float x, float y /* o ile ruszyæ */)
 {
 	bool collision = false;
 
@@ -62,13 +55,13 @@ bool canItMove(float player_x, float player_y,  // wspó³rzêdne gracza
 	}
 	return !collision;
 }
-
 int main(void)
 {
 	//variables
 	bool done = false;
 	bool render = false;
 
+	//przewijanie mapki
 	int xOff = 0;
 	int yOff = 0;
 
@@ -84,7 +77,8 @@ int main(void)
 	ALLEGRO_TIMER *timer;
 	ALLEGRO_BITMAP *bgTiles = NULL;
 	ALLEGRO_BITMAP *bgClouds = NULL;
-	ALLEGRO_BITMAP *sprite[maxFrame];
+	ALLEGRO_BITMAP *spritePlayer[maxFrame];
+	ALLEGRO_BITMAP *spriteMonster[maxFrame];
 	//	ALLEGRO_BITMAP *splash;
 
 	//program init
@@ -111,18 +105,25 @@ int main(void)
 	Player player;
 
 	// Wspó³rzêdne pocz¹tkowe gracza
-	player.x = 200;
-	player.y = 200;
+	player.x = 100;
+	player.y = 100;
 
-	sprite[0] = al_load_bitmap("00.gif");
-	sprite[1] = al_load_bitmap("01.gif");
-	sprite[2] = al_load_bitmap("02.gif");
-	sprite[3] = al_load_bitmap("03.gif");
-	sprite[4] = al_load_bitmap("04.gif");
-	sprite[5] = al_load_bitmap("05.gif");
+	spritePlayer[0] = al_load_bitmap("00.gif");
+	spritePlayer[1] = al_load_bitmap("01.gif");
+	spritePlayer[2] = al_load_bitmap("02.gif");
+	spritePlayer[3] = al_load_bitmap("03.gif");
+	spritePlayer[4] = al_load_bitmap("04.gif");
+	spritePlayer[5] = al_load_bitmap("05.gif");
+
+	spriteMonster[0] = al_load_bitmap("monster00.gif");
+	spriteMonster[1] = al_load_bitmap("monster01.gif");
+	spriteMonster[2] = al_load_bitmap("monster02.gif");
+	spriteMonster[3] = al_load_bitmap("monster03.gif");
+	spriteMonster[4] = al_load_bitmap("monster04.gif");
+	spriteMonster[5] = al_load_bitmap("monster05.gif");
 
 	for (int i = 0; i < maxFrame; i++)
-		al_convert_mask_to_alpha(sprite[i], al_map_rgb(106, 76, 48));
+		al_convert_mask_to_alpha(spritePlayer[i], al_map_rgb(106, 76, 48));
 
 	// kolejka zdarzen
 	event_queue = al_create_event_queue();
@@ -139,6 +140,7 @@ int main(void)
 	al_destroy_bitmap(splash);
 	*/
 	al_start_timer(timer);
+
 	while (!done)
 	{
 		ALLEGRO_EVENT ev;
@@ -188,6 +190,7 @@ int main(void)
 		}
 		else if (ev.type == ALLEGRO_EVENT_TIMER)
 		{
+
 			if (++frameCount >= frameDelay)
 			{
 				if (++curFrame >= maxFrame)
@@ -231,7 +234,7 @@ int main(void)
 			}
 
 
-			
+
 
 			//przeliczenie wspó³rzêdnych mapy
 			//gracz z prawej
@@ -255,7 +258,7 @@ int main(void)
 			render = false;
 
 			//rysuj tlo
-			al_draw_bitmap(bgClouds, 0 + xOff/4, 0, 0);
+			al_draw_bitmap(bgClouds, 0 + xOff / 8, 0, 0);
 
 			//rysuj bloczki
 			for (int i = 0; i < sizeArrayMap; i++)
@@ -265,7 +268,12 @@ int main(void)
 			}
 
 			//rysuj gracza
-			al_draw_bitmap(sprite[curFrame], player.x + xOff, player.y + yOff, 0);
+			al_draw_bitmap(spritePlayer[curFrame], player.x + xOff, player.y + yOff, 0);
+
+			//rysuj potwory
+			al_draw_bitmap(spriteMonster[curFrame], 700 + xOff, 200 + yOff, 0);
+			al_draw_bitmap(spriteMonster[curFrame], 1100 + xOff, 400 + yOff, 0);
+			al_draw_bitmap(spriteMonster[curFrame], 1200 + xOff, 300 + yOff, 0);
 
 			al_flip_display();
 			al_clear_to_color(al_map_rgb(0, 0, 0));
@@ -273,7 +281,7 @@ int main(void)
 	}
 
 	for (int i = 0; i < maxFrame; i++)
-		al_destroy_bitmap(sprite[i]);
+		al_destroy_bitmap(spritePlayer[i]);
 
 	al_destroy_bitmap(bgClouds);
 	al_destroy_bitmap(bgTiles);

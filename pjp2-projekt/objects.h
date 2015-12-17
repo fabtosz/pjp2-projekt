@@ -4,12 +4,21 @@ struct Player
 	float y;
 };
 
+struct Monster
+{
+	float x;
+	float y;
+	float sizeX = 53;
+	float sizeY = 85;
+};
+
+float playerSizeX = 70;
+float playerSizeY = 94;
+
 int mapColumns = 40;
 int sizeArrayMap = 400;
 
 float tileSize = 50;
-float playerSizeX = 70;
-float playerSizeY = 94;
 
 int mapWidth = tileSize * mapColumns;
 
