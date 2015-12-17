@@ -45,7 +45,7 @@ bool canItMove(float player_x, float player_y,  /* wspó³rzêdne gracza */float x,
 	for (int i = 0; i < sizeArrayMap; i++)
 	{
 		//jeœli klocek jest powietrzem to go pomiñ
-		if (map[i] != 0)
+		if (map[i] != 0 && map[i] != 3)
 		{
 			if (isCollidePlayerTile(player_x + x, player_y + y, tileSize * (i % mapColumns), tileSize * (i / mapColumns)))
 			{
