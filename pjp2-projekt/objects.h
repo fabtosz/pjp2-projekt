@@ -2,6 +2,7 @@ struct Player
 {
 	float x;
 	float y;
+	int lives = 200;
 };
 
 struct Monster

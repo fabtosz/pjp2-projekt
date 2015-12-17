@@ -5,6 +5,7 @@
 #include <allegro5/allegro_ttf.h>
 #include "objects.h"
 #include <math.h>
+#include <iostream>
 
 using namespace std;
 
@@ -107,6 +108,21 @@ int main(void)
 	// Wspó³rzêdne pocz¹tkowe gracza
 	player.x = 100;
 	player.y = 100;
+
+	// potwory
+	Monster monster1;
+	Monster monster2;
+	Monster monster3;
+
+	// Wspó³rzêdne potwora 1
+	monster1.x = 300;
+	monster1.y = 200;
+	// Wspó³rzêdne potwora 2
+	monster2.x = 1000;
+	monster2.y = 200;
+	// Wspó³rzêdne potwora 3
+	monster3.x = 800;
+	monster3.y = 100;
 
 	spritePlayer[0] = al_load_bitmap("00.gif");
 	spritePlayer[1] = al_load_bitmap("01.gif");
@@ -271,9 +287,28 @@ int main(void)
 			al_draw_bitmap(spritePlayer[curFrame], player.x + xOff, player.y + yOff, 0);
 
 			//rysuj potwory
-			al_draw_bitmap(spriteMonster[curFrame], 700 + xOff, 200 + yOff, 0);
-			al_draw_bitmap(spriteMonster[curFrame], 1100 + xOff, 400 + yOff, 0);
-			al_draw_bitmap(spriteMonster[curFrame], 1200 + xOff, 300 + yOff, 0);
+			al_draw_bitmap(spriteMonster[curFrame], monster1.x + xOff, monster1.y + yOff, 0);
+			al_draw_bitmap(spriteMonster[curFrame], monster2.x + xOff, monster2.y + yOff, 0);
+			al_draw_bitmap(spriteMonster[curFrame], monster3.x + xOff, monster3.y + yOff, 0);
+
+			
+			if (isCollide(player.x, player.y, playerSizeX, playerSizeY, monster1.x, monster1.y, monster1.sizeX, monster1.sizeY) ||
+				isCollide(player.x, player.y, playerSizeX, playerSizeY, monster2.x, monster2.y, monster2.sizeX, monster2.sizeY) ||
+				isCollide(player.x, player.y, playerSizeX, playerSizeY, monster3.x, monster3.y, monster3.sizeX, monster3.sizeY))
+			{
+					player.lives--;
+			}
+
+			//pasek zycia
+			al_draw_filled_rectangle(50, 50, 200, 60, al_map_rgb(165, 0, 0));
+			al_draw_filled_rectangle(50, 50, player.lives, 60, al_map_rgb(255, 0, 0));
+
+			if (player.lives == 50)
+			{
+			    cout << "G A M E    O V E R !";
+				al_rest(2.0);
+				done = true;
+			}
 
 			al_flip_display();
 			al_clear_to_color(al_map_rgb(0, 0, 0));
