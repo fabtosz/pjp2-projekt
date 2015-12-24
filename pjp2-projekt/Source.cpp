@@ -56,6 +56,17 @@ bool canItMove(float player_x, float player_y,  /* wspó³rzêdne gracza */float x,
 	}
 	return !collision;
 }
+bool isOnSolidGround(int player_x, int player_y)
+{
+	if (!canItMove(player_x, player_y, 0, 5))
+	{
+		return true;
+	}
+	else
+	{
+		return false;
+	}
+}
 int main(void)
 {
 	//variables
@@ -155,6 +166,10 @@ int main(void)
 	al_rest(3.0);
 	al_destroy_bitmap(splash);
 	*/
+
+	bool mayJumpAgain = true;
+	int wysokoscSkoku = 0;
+
 	al_start_timer(timer);
 
 	while (!done)
@@ -233,24 +248,48 @@ int main(void)
 				}
 			}
 
-			if (keys[UP])
+			/* * * *  S K A K A N I E * * * */
+			if (mayJumpAgain)
 			{
-				if (canItMove(player.x, player.y, 0, -5))
+				if (keys[UP])
 				{
-					player.y -= 10;
+					if (canItMove(player.x, player.y, 0, -5))
+					{
+						player.y -= 10;
+						wysokoscSkoku++;
+					}
+					if (wysokoscSkoku == 45)
+					{
+						mayJumpAgain = false;
+					}
 				}
 			}
-
-			if (!keys[DOWN])
+			if (!mayJumpAgain)
 			{
-				if (canItMove(player.x, player.y, 0, 5))
+				if (isOnSolidGround(player.x, player.y))
 				{
-					player.y += 5;
+					wysokoscSkoku = 0;
+					mayJumpAgain = true;
 				}
 			}
+			if (!canItMove(player.x, player.y, 0, -5))
+			{
+				wysokoscSkoku = 0;
+				mayJumpAgain = false;
+			}
+			if (isOnSolidGround(player.x, player.y))
+			{
+				wysokoscSkoku = 0;
+				mayJumpAgain = true;
+			}
+			/* * * * * * * * * * * * * * * */
 
-
-
+			//spadanie
+			if (canItMove(player.x, player.y, 0, 5))
+			{
+				player.y += 5;
+			}
+			
 
 			//przeliczenie wspó³rzêdnych mapy
 			//gracz z prawej
@@ -291,12 +330,12 @@ int main(void)
 			al_draw_bitmap(spriteMonster[curFrame], monster2.x + xOff, monster2.y + yOff, 0);
 			al_draw_bitmap(spriteMonster[curFrame], monster3.x + xOff, monster3.y + yOff, 0);
 
-			
+
 			if (isCollide(player.x, player.y, playerSizeX, playerSizeY, monster1.x, monster1.y, monster1.sizeX, monster1.sizeY) ||
 				isCollide(player.x, player.y, playerSizeX, playerSizeY, monster2.x, monster2.y, monster2.sizeX, monster2.sizeY) ||
 				isCollide(player.x, player.y, playerSizeX, playerSizeY, monster3.x, monster3.y, monster3.sizeX, monster3.sizeY))
 			{
-					player.lives--;
+				player.lives--;
 			}
 
 			//pasek zycia
@@ -305,7 +344,7 @@ int main(void)
 
 			if (player.lives == 50)
 			{
-			    cout << "G A M E    O V E R !";
+				cout << "G A M E    O V E R !";
 				al_rest(2.0);
 				done = true;
 			}
