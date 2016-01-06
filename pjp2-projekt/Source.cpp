@@ -69,47 +69,10 @@ bool isOnSolidGround(int player_x, int player_y)
 	}
 }
 
-void initBullet(Bullet bullet[], int size)
-{
-	for (int i = 0; i < size; i++)
-	{
-		bullet[i].speed = 10;
-		bullet[i].live = false;
-	}
-}
-void drawBullet(Bullet bullet[], int size)
-{
-	for (int i = 0; i < size; i++)
-	{
-		if (bullet[i].live)
-			al_draw_filled_circle(bullet[i].x, bullet[i].y, 5, al_map_rgb(0,255,255));
-	}
-}
-void fireBullet(Bullet bullet[], int size, Player &player)
-{
-	for (int i = 0; i < size; i++)
-	{
-		if (!bullet[i].live)
-		{
-			bullet[i].x = player.x + 17 + xOff;
-			bullet[i].y = player.y + 17;
-			bullet[i].live = true;
-			break;
-		}
-	}
-}
-void updateBullet(Bullet bullet[], int size)
-{
-	for (int i = 0; i < size; i++)
-	{
-		if (bullet[i].live)
-		{
-			bullet[i].x += bullet[i].speed;
-			if (bullet[i].x > WIDTH)
-				bullet[i].live = false;
-		}
-	}
-}
+void InitBullet(Bullet bullet[], int size);
+void DrawBullet(Bullet bullet[], int size);
+void FireBullet(Bullet bullet[], int size, Player &player);
+void UpdateBullet(Bullet bullet[], int size, Player &player);
 void MovePlayerRight(Player &player);
 void MovePlayerLeft(Player &player);
 
@@ -167,22 +130,20 @@ int main(void)
 	// pociski
 	Bullet bullets[NUM_BULLETS];
 
-	initBullet(bullets, NUM_BULLETS);
+	InitBullet(bullets, NUM_BULLETS);
 
 	// potwory
-	Monster monster1;
-	Monster monster2;
-	Monster monster3;
+	Monster monster[3];
 
 	// Współrzędne potwora 1
-	monster1.x = 300;
-	monster1.y = 100;
+	monster[0].x = 300;
+	monster[0].y = 100;
 	// Współrzędne potwora 2
-	monster2.x = 1000;
-	monster2.y = 200;
+	monster[1].x = 1000;
+	monster[1].y = 200;
 	// Współrzędne potwora 3
-	monster3.x = 800;
-	monster3.y = 100;
+	monster[2].x = 800;
+	monster[2].y = 100;
 
 	spritePlayer[0] = al_load_bitmap("00.gif");
 	spritePlayer[1] = al_load_bitmap("01.gif");
@@ -272,7 +233,12 @@ int main(void)
 				break;
 			case ALLEGRO_KEY_SPACE:
 				keys[SPACE] = false;
-				fireBullet(bullets, NUM_BULLETS, player);
+				if (player.mana > 100)
+				{
+					FireBullet(bullets, NUM_BULLETS, player);
+					if (player.mana > 100)
+						player.mana -= 50;
+				}
 				break;
 			}
 		}
@@ -293,7 +259,6 @@ int main(void)
 				MovePlayerRight(player);
 			if (keys[LEFT])
 				MovePlayerLeft(player);
-
 			/* * * *  S K A K A N I E * * * */
 			if (mayJumpAgain)
 			{
@@ -311,8 +276,6 @@ int main(void)
 				}
 				else mayJumpAgain = false;
 			}
-
-
 			if (!mayJumpAgain)
 			{
 				if (isOnSolidGround(player.x, player.y))
@@ -376,51 +339,58 @@ int main(void)
 			al_draw_bitmap(spritePlayer[curFrame], player.x + xOff, player.y + yOff, 0);
 
 			//rysuj pociski
-			drawBullet(bullets, NUM_BULLETS);
-			updateBullet(bullets, NUM_BULLETS);
+			DrawBullet(bullets, NUM_BULLETS);
+			UpdateBullet(bullets, NUM_BULLETS, player);
 
 			//rysuj potwory
-			al_draw_bitmap(spriteMonster[curFrame], monster1.x + xOff, monster1.y + yOff, 0);
-			al_draw_bitmap(spriteMonster[curFrame], monster2.x + xOff, monster2.y + yOff, 0);
-			al_draw_bitmap(spriteMonster[curFrame], monster3.x + xOff, monster3.y + yOff, 0);
+			al_draw_bitmap(spriteMonster[curFrame], monster[0].x + xOff, monster[0].y + yOff, 0);
+			al_draw_bitmap(spriteMonster[curFrame], monster[1].x + xOff, monster[1].y + yOff, 0);
+			al_draw_bitmap(spriteMonster[curFrame], monster[2].x + xOff, monster[2].y + yOff, 0);
 
 			//ruch potwora
-			if (canItMove(monster1.x, monster1.y, 0, 5))
+			if (canItMove(monster[0].x, monster[0].y, 0, 5))
 			{
-				monster1.y += 4;
+				monster[0].y += 4;
 			}
-			if (canItMove(monster2.x, monster2.y, 0, 5))
+			if (canItMove(monster[1].x, monster[1].y, 0, 5))
 			{
-				monster2.y += 4;
+				monster[1].y += 4;
 			}
-			if (canItMove(monster3.x, monster3.y, 0, 5))
+			if (canItMove(monster[2].x, monster[2].y, 0, 5))
 			{
-				monster3.y += 4;
+				monster[2].y += 4;
 			}
-			if (canItMove(monster1.x, monster1.y, 0, 0))
+			if (canItMove(monster[0].x, monster[0].y, 0, 0))
 			{
-				monster1.x -= 0.8*kierunek;
+				monster[0].x -= 0.8*kierunek;
 			}
-			if (!canItMove(monster1.x, monster1.y, -5, 0))
+			if (!canItMove(monster[0].x, monster[0].y, -5, 0))
 			{
 				kierunek = -1;
 			}
-			if (!canItMove(monster1.x, monster1.y, 5, 0))
+			if (!canItMove(monster[0].x, monster[0].y, 5, 0))
 			{
 				kierunek = 1;
 			}
 
 			//kolizja z potworami
-			if (isCollide(player.x, player.y, playerSizeX, playerSizeY, monster1.x, monster1.y, monster1.sizeX, monster1.sizeY) ||
-				isCollide(player.x, player.y, playerSizeX, playerSizeY, monster2.x, monster2.y, monster2.sizeX, monster2.sizeY) ||
-				isCollide(player.x, player.y, playerSizeX, playerSizeY, monster3.x, monster3.y, monster3.sizeX, monster3.sizeY))
+			for (int i = 0; i < 3; i++)
 			{
-				player.lives--;
+				if (isCollide(player.x, player.y, playerSizeX, playerSizeY, monster[i].x, monster[i].y, monster[i].sizeX, monster[i].sizeY))
+					player.lives--;
 			}
 
 			//pasek zycia
 			al_draw_filled_rectangle(50, 50, 200, 60, al_map_rgb(165, 0, 0));
 			al_draw_filled_rectangle(50, 50, player.lives, 60, al_map_rgb(255, 0, 0));
+
+			//pasek many
+			al_draw_filled_rectangle(400, 50, 550, 60, al_map_rgb(30, 80, 70));
+			al_draw_filled_rectangle(400, 50, 350 + player.mana, 60, al_map_rgb(30, 150, 250));
+
+			// ładowanie many
+			if (player.mana >= 0 && player.mana <= 200)
+				player.mana += 0.4;
 
 			if (player.lives == 50)
 			{
@@ -449,6 +419,7 @@ void MovePlayerRight(Player &player)
 	if (canItMove(player.x, player.y, 5, 0))
 	{
 		player.x += 5;
+		player.side = 1;
 	}
 }
 void MovePlayerLeft(Player &player)
@@ -456,5 +427,50 @@ void MovePlayerLeft(Player &player)
 	if (canItMove(player.x, player.y, -5, 0))
 	{
 		player.x -= 5;
+		player.side = -1;
+	}
+}
+void InitBullet(Bullet bullet[], int size)
+{
+	for (int i = 0; i < size; i++)
+	{
+		bullet[i].speed = 10;
+		bullet[i].live = false;
+	}
+}
+void DrawBullet(Bullet bullet[], int size)
+{
+	for (int i = 0; i < size; i++)
+	{
+		if (bullet[i].live)
+		{
+			al_draw_filled_circle(bullet[i].x, bullet[i].y, 7, al_map_rgb(0, 255, 255));
+			al_draw_filled_circle(bullet[i].x, bullet[i].y, 3, al_map_rgb(255, 255, 255));
+		}
+	}
+}
+void FireBullet(Bullet bullet[], int size, Player &player)
+{
+	for (int i = 0; i < size; i++)
+	{
+		if (!bullet[i].live)
+		{
+			bullet[i].x = player.x + 17 + xOff;
+			bullet[i].y = player.y + 17;
+			bullet[i].live = true;
+			break;
+		}
+	}
+}
+void UpdateBullet(Bullet bullet[], int size, Player &player)
+{
+	for (int i = 0; i < size; i++)
+	{
+		if (bullet[i].live)
+		{
+			bullet[i].x += bullet[i].speed;
+			if (bullet[i].x > WIDTH || bullet[i].x < 0)
+				bullet[i].live = false;
+		}
 	}
 }
