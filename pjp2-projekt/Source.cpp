@@ -1,4 +1,4 @@
-#include <allegro5/allegro.h>
+ï»¿#include <allegro5/allegro.h>
 #include <allegro5/allegro_image.h>
 #include <allegro5/allegro_primitives.h>
 #include <allegro5/allegro_font.h>
@@ -11,11 +11,12 @@ using namespace std;
 
 const int WIDTH = 600;
 const int HEIGHT = 500;
+const int NUM_BULLETS = 3;
 
-bool keys[] = { false, false, false, false };
-enum KEYS{ UP, DOWN, LEFT, RIGHT };
+bool keys[] = { false, false, false, false, false };
+enum KEYS{ UP, DOWN, LEFT, RIGHT, SPACE };
 
-//ogólne sprawdzenie kolizji
+//ogÃ³lne sprawdzenie kolizji
 bool isCollide(float pos1_x, float pos1_y, float size1_x, float size1_y, float pos2_x, float pos2_y, float size2_x, float size2_y)
 {
 	if ((pos1_x > pos2_x + size2_x - 1) || // is b1 on the right side of b2?
@@ -31,20 +32,20 @@ bool isCollide(float pos1_x, float pos1_y, float size1_x, float size1_y, float p
 }
 
 // Sprawdzenie kolizji gracza z bloczkiem
-// u¿ycie isCollide z konkretnymi rozmiarami prostok¹tów
+// uÅ¼ycie isCollide z konkretnymi rozmiarami prostokÄ…tÃ³w
 bool isCollidePlayerTile(float player_x, float player_y, float tile_x, float tile_y)
 {
 	return isCollide(player_x, player_y, playerSizeX, playerSizeY, tile_x, tile_y, tileSize, tileSize);
 }
 
-bool canItMove(float player_x, float player_y,  /* wspó³rzêdne gracza */float x, float y /* o ile ruszyæ */)
+bool canItMove(float player_x, float player_y,  /* wspÃ³Å‚rzÄ™dne gracza */float x, float y /* o ile ruszyÄ‡ */)
 {
 	bool collision = false;
 
-	//sprawdz kolizje dla ka¿dego kloca
+	//sprawdz kolizje dla kaÅ¼dego kloca
 	for (int i = 0; i < sizeArrayMap; i++)
 	{
-		//jeœli klocek jest powietrzem to go pomiñ
+		//jeÅ›li klocek jest powietrzem to go pomiÅ„
 		if (map[i] != 0 && map[i] != 3)
 		{
 			if (isCollidePlayerTile(player_x + x, player_y + y, tileSize * (i % mapColumns), tileSize * (i / mapColumns)))
@@ -67,15 +68,58 @@ bool isOnSolidGround(int player_x, int player_y)
 		return false;
 	}
 }
+
+void initBullet(Bullet bullet[], int size)
+{
+	for (int i = 0; i < size; i++)
+	{
+		bullet[i].speed = 10;
+		bullet[i].live = false;
+	}
+}
+void drawBullet(Bullet bullet[], int size)
+{
+	for (int i = 0; i < size; i++)
+	{
+		if (bullet[i].live)
+			al_draw_filled_circle(bullet[i].x, bullet[i].y, 5, al_map_rgb(0,255,255));
+	}
+}
+void fireBullet(Bullet bullet[], int size, Player &player)
+{
+	for (int i = 0; i < size; i++)
+	{
+		if (!bullet[i].live)
+		{
+			bullet[i].x = player.x + 17 + xOff;
+			bullet[i].y = player.y + 17;
+			bullet[i].live = true;
+			break;
+		}
+	}
+}
+void updateBullet(Bullet bullet[], int size)
+{
+	for (int i = 0; i < size; i++)
+	{
+		if (bullet[i].live)
+		{
+			bullet[i].x += bullet[i].speed;
+			if (bullet[i].x > WIDTH)
+				bullet[i].live = false;
+		}
+	}
+}
+void MovePlayerRight(Player &player);
+void MovePlayerLeft(Player &player);
+
 int main(void)
 {
 	//variables
 	bool done = false;
 	bool render = false;
 
-	//przewijanie mapki
-	int xOff = 0;
-	int yOff = 0;
+	
 
 	// zmienne sprite'a
 	const int maxFrame = 6;
@@ -116,22 +160,27 @@ int main(void)
 	// gracz
 	Player player;
 
-	// Wspó³rzêdne pocz¹tkowe gracza
+	// WspÃ³Å‚rzÄ™dne poczÄ…tkowe gracza
 	player.x = 100;
 	player.y = 100;
+
+	// pociski
+	Bullet bullets[NUM_BULLETS];
+
+	initBullet(bullets, NUM_BULLETS);
 
 	// potwory
 	Monster monster1;
 	Monster monster2;
 	Monster monster3;
 
-	// Wspó³rzêdne potwora 1
+	// WspÃ³Å‚rzÄ™dne potwora 1
 	monster1.x = 300;
-	monster1.y = 200;
-	// Wspó³rzêdne potwora 2
+	monster1.y = 100;
+	// WspÃ³Å‚rzÄ™dne potwora 2
 	monster2.x = 1000;
 	monster2.y = 200;
-	// Wspó³rzêdne potwora 3
+	// WspÃ³Å‚rzÄ™dne potwora 3
 	monster3.x = 800;
 	monster3.y = 100;
 
@@ -169,6 +218,7 @@ int main(void)
 
 	bool mayJumpAgain = true;
 	int wysokoscSkoku = 0;
+	double kierunek = 1;
 
 	al_start_timer(timer);
 
@@ -196,6 +246,9 @@ int main(void)
 			case ALLEGRO_KEY_DOWN:
 				keys[DOWN] = true;
 				break;
+			case ALLEGRO_KEY_SPACE:
+				keys[SPACE] = true;
+				break;
 			}
 		}
 		else if (ev.type == ALLEGRO_EVENT_KEY_UP)
@@ -217,11 +270,15 @@ int main(void)
 			case ALLEGRO_KEY_DOWN:
 				keys[DOWN] = false;
 				break;
+			case ALLEGRO_KEY_SPACE:
+				keys[SPACE] = false;
+				fireBullet(bullets, NUM_BULLETS, player);
+				break;
 			}
 		}
 		else if (ev.type == ALLEGRO_EVENT_TIMER)
 		{
-
+			//sprity
 			if (++frameCount >= frameDelay)
 			{
 				if (++curFrame >= maxFrame)
@@ -231,22 +288,11 @@ int main(void)
 			}
 
 			// tu jest zmieniana pozycja grcza
-			// jeœli ruch wywo³a zderzenie z drugim obiektem to nie jest wykonywany 
+			// jeÅ›li ruch wywoÅ‚a zderzenie z drugim obiektem to nie jest wykonywany 
 			if (keys[RIGHT])
-			{
-				if (canItMove(player.x, player.y, 5, 0))
-				{
-					player.x += 5;
-				}
-			}
-
+				MovePlayerRight(player);
 			if (keys[LEFT])
-			{
-				if (canItMove(player.x, player.y, -5, 0))
-				{
-					player.x -= 5;
-				}
-			}
+				MovePlayerLeft(player);
 
 			/* * * *  S K A K A N I E * * * */
 			if (mayJumpAgain)
@@ -258,12 +304,15 @@ int main(void)
 						player.y -= 10;
 						wysokoscSkoku++;
 					}
-					if (wysokoscSkoku == 45)
+					if (wysokoscSkoku == 30)
 					{
 						mayJumpAgain = false;
 					}
 				}
+				else mayJumpAgain = false;
 			}
+
+
 			if (!mayJumpAgain)
 			{
 				if (isOnSolidGround(player.x, player.y))
@@ -289,14 +338,14 @@ int main(void)
 			{
 				player.y += 5;
 			}
-			
 
-			//przeliczenie wspó³rzêdnych mapy
+
+			//przeliczenie wspÃ³Å‚rzÄ™dnych mapy
 			//gracz z prawej
 			if (player.x < WIDTH / 2) {
 				xOff = 0;
 			}
-			//gracz w œrodku
+			//gracz w Å›rodku
 			if (WIDTH / 2 < player.x  && player.x < mapWidth - WIDTH / 2) {
 				xOff = -(player.x - WIDTH / 2);
 			}
@@ -308,6 +357,7 @@ int main(void)
 			render = true;
 		}
 
+		// if od rysowania
 		if (render && al_is_event_queue_empty(event_queue))
 		{
 			render = false;
@@ -325,12 +375,42 @@ int main(void)
 			//rysuj gracza
 			al_draw_bitmap(spritePlayer[curFrame], player.x + xOff, player.y + yOff, 0);
 
+			//rysuj pociski
+			drawBullet(bullets, NUM_BULLETS);
+			updateBullet(bullets, NUM_BULLETS);
+
 			//rysuj potwory
 			al_draw_bitmap(spriteMonster[curFrame], monster1.x + xOff, monster1.y + yOff, 0);
 			al_draw_bitmap(spriteMonster[curFrame], monster2.x + xOff, monster2.y + yOff, 0);
 			al_draw_bitmap(spriteMonster[curFrame], monster3.x + xOff, monster3.y + yOff, 0);
 
+			//ruch potwora
+			if (canItMove(monster1.x, monster1.y, 0, 5))
+			{
+				monster1.y += 4;
+			}
+			if (canItMove(monster2.x, monster2.y, 0, 5))
+			{
+				monster2.y += 4;
+			}
+			if (canItMove(monster3.x, monster3.y, 0, 5))
+			{
+				monster3.y += 4;
+			}
+			if (canItMove(monster1.x, monster1.y, 0, 0))
+			{
+				monster1.x -= 0.8*kierunek;
+			}
+			if (!canItMove(monster1.x, monster1.y, -5, 0))
+			{
+				kierunek = -1;
+			}
+			if (!canItMove(monster1.x, monster1.y, 5, 0))
+			{
+				kierunek = 1;
+			}
 
+			//kolizja z potworami
 			if (isCollide(player.x, player.y, playerSizeX, playerSizeY, monster1.x, monster1.y, monster1.sizeX, monster1.sizeY) ||
 				isCollide(player.x, player.y, playerSizeX, playerSizeY, monster2.x, monster2.y, monster2.sizeX, monster2.sizeY) ||
 				isCollide(player.x, player.y, playerSizeX, playerSizeY, monster3.x, monster3.y, monster3.sizeX, monster3.sizeY))
@@ -363,4 +443,18 @@ int main(void)
 	al_destroy_display(display);						//destroy our display object
 
 	return 0;
+}
+void MovePlayerRight(Player &player)
+{
+	if (canItMove(player.x, player.y, 5, 0))
+	{
+		player.x += 5;
+	}
+}
+void MovePlayerLeft(Player &player)
+{
+	if (canItMove(player.x, player.y, -5, 0))
+	{
+		player.x -= 5;
+	}
 }
