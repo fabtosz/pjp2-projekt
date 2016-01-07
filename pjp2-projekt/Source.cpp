@@ -302,6 +302,44 @@ int main(void)
 				player.y += 5;
 			}
 
+			//kolizja gracza z potworami
+			for (int i = 0; i < 3; i++)
+			{
+				if (isCollide(player.x, player.y, playerSizeX, playerSizeY, monster[i].x, monster[i].y, monster[i].sizeX, monster[i].sizeY))
+					player.lives--;
+			}
+
+			//kolizja pociskow z potworami
+			for (int i = 0; i < 3; i++)
+			{
+					if (isCollide(bullets[i].x, bullets[i].y, bullets[i].size, bullets[i].size, monster[0].x, monster[0].y, monster[0].sizeX, monster[0].sizeY))
+					{
+						monster[0].alive = false;
+						monster[0].x = -100;
+						monster[0].y = -100;
+						player.points += 100;
+						cout << player.points << endl;
+					}
+					if (isCollide(bullets[i].x, bullets[i].y, bullets[i].size, bullets[i].size, monster[1].x, monster[1].y, monster[1].sizeX, monster[1].sizeY))
+					{
+						monster[1].alive = false;
+						monster[1].x = -100;
+						monster[1].y = -100;
+						player.points += 100;
+						cout << player.points << endl;
+					}
+			}
+			for (int i = 0; i < 3; i++)
+			{
+				if (isCollide(bullets[i].x, bullets[i].y, bullets[i].size, bullets[i].size, monster[1].x, monster[1].y, monster[1].sizeX, monster[1].sizeY))
+				{
+					monster[1].alive = false;
+					monster[1].x = -100;
+					monster[1].y = -100;
+					player.points += 100;
+					cout << player.points << endl;
+				}
+			}
 
 			//przeliczenie współrzędnych mapy
 			//gracz z prawej
@@ -343,9 +381,11 @@ int main(void)
 			UpdateBullet(bullets, NUM_BULLETS, player);
 
 			//rysuj potwory
-			al_draw_bitmap(spriteMonster[curFrame], monster[0].x + xOff, monster[0].y + yOff, 0);
-			al_draw_bitmap(spriteMonster[curFrame], monster[1].x + xOff, monster[1].y + yOff, 0);
-			al_draw_bitmap(spriteMonster[curFrame], monster[2].x + xOff, monster[2].y + yOff, 0);
+			for (int i = 0; i < 3; i++)
+			{
+				if(monster[i].alive)
+					al_draw_bitmap(spriteMonster[curFrame], monster[i].x + xOff, monster[i].y + yOff, 0);
+			}
 
 			//ruch potwora
 			if (canItMove(monster[0].x, monster[0].y, 0, 5))
@@ -373,13 +413,7 @@ int main(void)
 				kierunek = 1;
 			}
 
-			//kolizja z potworami
-			for (int i = 0; i < 3; i++)
-			{
-				if (isCollide(player.x, player.y, playerSizeX, playerSizeY, monster[i].x, monster[i].y, monster[i].sizeX, monster[i].sizeY))
-					player.lives--;
-			}
-
+			
 			//pasek zycia
 			al_draw_filled_rectangle(50, 50, 200, 60, al_map_rgb(165, 0, 0));
 			al_draw_filled_rectangle(50, 50, player.lives, 60, al_map_rgb(255, 0, 0));
@@ -435,16 +469,16 @@ void InitBullet(Bullet bullet[], int size)
 	for (int i = 0; i < size; i++)
 	{
 		bullet[i].speed = 10;
-		bullet[i].live = false;
+		bullet[i].alive = false;
 	}
 }
 void DrawBullet(Bullet bullet[], int size)
 {
 	for (int i = 0; i < size; i++)
 	{
-		if (bullet[i].live)
+		if (bullet[i].alive)
 		{
-			al_draw_filled_circle(bullet[i].x, bullet[i].y, 7, al_map_rgb(0, 255, 255));
+			al_draw_filled_circle(bullet[i].x, bullet[i].y, 8, al_map_rgb(0, 255, 255));
 			al_draw_filled_circle(bullet[i].x, bullet[i].y, 3, al_map_rgb(255, 255, 255));
 		}
 	}
@@ -453,11 +487,11 @@ void FireBullet(Bullet bullet[], int size, Player &player)
 {
 	for (int i = 0; i < size; i++)
 	{
-		if (!bullet[i].live)
+		if (!bullet[i].alive)
 		{
 			bullet[i].x = player.x + 17 + xOff;
 			bullet[i].y = player.y + 17;
-			bullet[i].live = true;
+			bullet[i].alive = true;
 			break;
 		}
 	}
@@ -466,11 +500,11 @@ void UpdateBullet(Bullet bullet[], int size, Player &player)
 {
 	for (int i = 0; i < size; i++)
 	{
-		if (bullet[i].live)
+		if (bullet[i].alive)
 		{
 			bullet[i].x += bullet[i].speed;
 			if (bullet[i].x > WIDTH || bullet[i].x < 0)
-				bullet[i].live = false;
+				bullet[i].alive = false;
 		}
 	}
 }

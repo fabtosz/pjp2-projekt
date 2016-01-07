@@ -5,6 +5,7 @@ struct Player
 	int side = 1;
 	double lives = 200;
 	double mana = 200;
+	int points = 0;
 };
 
 struct Monster
@@ -13,14 +14,15 @@ struct Monster
 	float y;
 	float sizeX = 53;
 	float sizeY = 85;
-	bool live = true;
+	bool alive = true;
 };
 
 struct Bullet
 {
 	int x;
 	int y;
-	bool live;
+	int size = 4;
+	bool alive = true;
 	int speed;
 };
 
