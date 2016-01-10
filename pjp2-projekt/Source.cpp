@@ -82,7 +82,7 @@ int main(void)
 	bool done = false;
 	bool render = false;
 
-	
+
 
 	// zmienne sprite'a
 	const int maxFrame = 6;
@@ -312,34 +312,24 @@ int main(void)
 			//kolizja pociskow z potworami
 			for (int i = 0; i < 3; i++)
 			{
-					if (isCollide(bullets[i].x, bullets[i].y, bullets[i].size, bullets[i].size, monster[0].x, monster[0].y, monster[0].sizeX, monster[0].sizeY))
-					{
-						monster[0].alive = false;
-						monster[0].x = -100;
-						monster[0].y = -100;
-						player.points += 100;
-						cout << player.points << endl;
-					}
-					if (isCollide(bullets[i].x, bullets[i].y, bullets[i].size, bullets[i].size, monster[1].x, monster[1].y, monster[1].sizeX, monster[1].sizeY))
-					{
-						monster[1].alive = false;
-						monster[1].x = -100;
-						monster[1].y = -100;
-						player.points += 100;
-						cout << player.points << endl;
-					}
-			}
-			for (int i = 0; i < 3; i++)
-			{
-				if (isCollide(bullets[i].x, bullets[i].y, bullets[i].size, bullets[i].size, monster[1].x, monster[1].y, monster[1].sizeX, monster[1].sizeY))
+				for (int j = 0; j < 3; j++)
 				{
-					monster[1].alive = false;
-					monster[1].x = -100;
-					monster[1].y = -100;
-					player.points += 100;
-					cout << player.points << endl;
+					if (isCollide(bullets[i].x, bullets[i].y, bullets[i].size, bullets[i].size, monster[j].x + xOff, monster[j].y + yOff, monster[j].sizeX, monster[j].sizeY))
+					{
+						monster[j].alive = bullets[i].alive = false;
+						monster[j].x = -100;
+						monster[j].y = -100;
+
+						bullets[i].alive = false;
+						bullets[i].x = -100;
+						bullets[i].y = -100;
+
+						player.points += 100;
+						cout << player.points << endl;
+					}
 				}
 			}
+
 
 			//przeliczenie współrzędnych mapy
 			//gracz z prawej
@@ -383,7 +373,7 @@ int main(void)
 			//rysuj potwory
 			for (int i = 0; i < 3; i++)
 			{
-				if(monster[i].alive)
+				if (monster[i].alive)
 					al_draw_bitmap(spriteMonster[curFrame], monster[i].x + xOff, monster[i].y + yOff, 0);
 			}
 
@@ -413,7 +403,7 @@ int main(void)
 				kierunek = 1;
 			}
 
-			
+
 			//pasek zycia
 			al_draw_filled_rectangle(50, 50, 200, 60, al_map_rgb(165, 0, 0));
 			al_draw_filled_rectangle(50, 50, player.lives, 60, al_map_rgb(255, 0, 0));
