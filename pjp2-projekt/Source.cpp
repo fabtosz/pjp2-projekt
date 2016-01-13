@@ -124,8 +124,8 @@ int main(void)
 	Player player;
 
 	// Współrzędne początkowe gracza
-	player.x = 100;
-	player.y = 100;
+	player.x = 50;
+	player.y = 50;
 
 	// pociski
 	Bullet bullets[NUM_BULLETS];
@@ -133,7 +133,7 @@ int main(void)
 	InitBullet(bullets, NUM_BULLETS);
 
 	// potwory
-	Monster monster[3];
+	Monster monster[4];
 
 	// Współrzędne potwora 1
 	monster[0].x = 300;
@@ -144,6 +144,9 @@ int main(void)
 	// Współrzędne potwora 3
 	monster[2].x = 800;
 	monster[2].y = 100;
+
+	monster[3].x = 1300;
+	monster[3].y = 100;
 
 	spritePlayer[0] = al_load_bitmap("00.gif");
 	spritePlayer[1] = al_load_bitmap("01.gif");
@@ -303,7 +306,7 @@ int main(void)
 			}
 
 			//kolizja gracza z potworami
-			for (int i = 0; i < 3; i++)
+			for (int i = 0; i < 4; i++)
 			{
 				if (isCollide(player.x, player.y, playerSizeX, playerSizeY, monster[i].x, monster[i].y, monster[i].sizeX, monster[i].sizeY))
 					player.lives--;
@@ -312,20 +315,26 @@ int main(void)
 			//kolizja pociskow z potworami
 			for (int i = 0; i < 3; i++)
 			{
-				for (int j = 0; j < 3; j++)
+				for (int j = 0; j < 4; j++)
 				{
 					if (isCollide(bullets[i].x, bullets[i].y, bullets[i].size, bullets[i].size, monster[j].x + xOff, monster[j].y + yOff, monster[j].sizeX, monster[j].sizeY))
 					{
-						monster[j].alive = bullets[i].alive = false;
-						monster[j].x = -100;
-						monster[j].y = -100;
+						bullets[i].alive = false;
+						monster[j].lives--;
+						if (monster[j].lives == 0)
+						{
+							monster[j].x = -100;
+							monster[j].y = -100;
+							monster[j].alive = false;
+						}
+						
 
 						bullets[i].alive = false;
 						bullets[i].x = -100;
 						bullets[i].y = -100;
 
 						player.points += 100;
-						cout << player.points << endl;
+						cout << "\t " << player.points << endl;
 					}
 				}
 			}
@@ -371,7 +380,7 @@ int main(void)
 			UpdateBullet(bullets, NUM_BULLETS, player);
 
 			//rysuj potwory
-			for (int i = 0; i < 3; i++)
+			for (int i = 0; i < 4; i++)
 			{
 				if (monster[i].alive)
 					al_draw_bitmap(spriteMonster[curFrame], monster[i].x + xOff, monster[i].y + yOff, 0);
@@ -494,7 +503,12 @@ void UpdateBullet(Bullet bullet[], int size, Player &player)
 		{
 			bullet[i].x += bullet[i].speed;
 			if (bullet[i].x > WIDTH || bullet[i].x < 0)
+			{
 				bullet[i].alive = false;
+				bullet[i].x = -100;
+				bullet[i].y = -100;
+			}
+				
 		}
 	}
 }
