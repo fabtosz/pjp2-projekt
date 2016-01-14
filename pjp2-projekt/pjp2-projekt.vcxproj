@@ -77,6 +77,8 @@
     <Image Include="04.gif" />
     <Image Include="05.gif" />
     <Image Include="clouds.png" />
+    <Image Include="death.jpg" />
+    <Image Include="mainpage.jpg" />
     <Image Include="monster00.gif" />
     <Image Include="monster01.gif" />
     <Image Include="monster02.gif" />

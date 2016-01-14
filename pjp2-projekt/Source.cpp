@@ -98,6 +98,9 @@ int main(void)
 	ALLEGRO_BITMAP *bgClouds = NULL;
 	ALLEGRO_BITMAP *spritePlayer[maxFrame];
 	ALLEGRO_BITMAP *spriteMonster[maxFrame];
+	ALLEGRO_BITMAP *mainPage = NULL;
+	ALLEGRO_BITMAP *endGame = NULL;
+
 	//	ALLEGRO_BITMAP *splash;
 
 	//program init
@@ -176,7 +179,7 @@ int main(void)
 	splash = al_load_bitmap("splash.jpg");
 	al_draw_bitmap(splash, 0, 0, 0);
 	al_flip_display();
-	al_rest(3.0);
+
 	al_destroy_bitmap(splash);
 	*/
 
@@ -184,6 +187,35 @@ int main(void)
 	int wysokoscSkoku = 0;
 	double kierunek = 1;
 
+	/* M E N U */
+	bool isStarted = false;
+
+	mainPage = al_load_bitmap("mainpage.jpg");
+	endGame = al_load_bitmap("death.jpg");
+	while (!isStarted)
+	{
+		al_draw_bitmap(mainPage, 0, 0, 0);
+		al_flip_display();
+
+		ALLEGRO_EVENT ev;
+		al_wait_for_event(event_queue, &ev);
+
+		if (ev.type == ALLEGRO_EVENT_KEY_DOWN)
+		{
+			switch (ev.keyboard.keycode)
+			{
+			case ALLEGRO_KEY_ESCAPE:
+				isStarted = true;
+				done = true;
+				break;
+			case ALLEGRO_KEY_ENTER:
+				isStarted = true;
+				break;
+			}
+		}
+	}
+
+	/* * * * * * * * * * * * */
 	al_start_timer(timer);
 
 	while (!done)
@@ -327,14 +359,12 @@ int main(void)
 							monster[j].y = -100;
 							monster[j].alive = false;
 						}
-						
+
 
 						bullets[i].alive = false;
 						bullets[i].x = -100;
 						bullets[i].y = -100;
 
-						player.points += 100;
-						cout << "\t " << player.points << endl;
 					}
 				}
 			}
@@ -427,8 +457,9 @@ int main(void)
 
 			if (player.lives == 50)
 			{
-				cout << "G A M E    O V E R !";
-				al_rest(2.0);
+				al_draw_bitmap(endGame, 0, 0, 0);
+				al_flip_display();
+				al_rest(3.0);
 				done = true;
 			}
 
@@ -443,7 +474,9 @@ int main(void)
 	al_destroy_bitmap(bgClouds);
 	al_destroy_bitmap(bgTiles);
 	al_destroy_event_queue(event_queue);
-	al_destroy_display(display);						//destroy our display object
+	al_destroy_display(display);
+	al_destroy_bitmap(mainPage);
+	al_destroy_bitmap(endGame);
 
 	return 0;
 }
@@ -508,7 +541,7 @@ void UpdateBullet(Bullet bullet[], int size, Player &player)
 				bullet[i].x = -100;
 				bullet[i].y = -100;
 			}
-				
+
 		}
 	}
 }

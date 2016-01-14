@@ -65,6 +65,12 @@
     <Image Include="monster05.gif">
       <Filter>Source Files</Filter>
     </Image>
+    <Image Include="death.jpg">
+      <Filter>Source Files</Filter>
+    </Image>
+    <Image Include="mainpage.jpg">
+      <Filter>Source Files</Filter>
+    </Image>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="objects.h">
