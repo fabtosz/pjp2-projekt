@@ -340,9 +340,18 @@ int main(void)
 			//kolizja gracza z potworami
 			for (int i = 0; i < 4; i++)
 			{
-				if (isCollide(player.x, player.y, playerSizeX, playerSizeY, monster[i].x, monster[i].y, monster[i].sizeX, monster[i].sizeY))
+				if (isCollide(player.x, player.y, playerSizeX, playerSizeY, monster[i].x, monster[i].y, monster[i].sizeX, monster[i].sizeY) && player.alive)
 					player.lives--;
 			}
+
+			//kolizja z przepascia
+			if (player.y > 550)
+			{
+				player.alive = false;
+				player.lives -= 100;
+				player.y = 0;
+			}
+			player.alive = true;
 
 			//kolizja pociskow z potworami
 			for (int i = 0; i < 3; i++)
@@ -353,6 +362,7 @@ int main(void)
 					{
 						bullets[i].alive = false;
 						monster[j].lives--;
+						
 						if (monster[j].lives == 0)
 						{
 							monster[j].x = -100;
@@ -403,7 +413,8 @@ int main(void)
 			}
 
 			//rysuj gracza
-			al_draw_bitmap(spritePlayer[curFrame], player.x + xOff, player.y + yOff, 0);
+			if(player.alive)
+				al_draw_bitmap(spritePlayer[curFrame], player.x + xOff, player.y + yOff, 0);
 
 			//rysuj pociski
 			DrawBullet(bullets, NUM_BULLETS);
@@ -419,7 +430,7 @@ int main(void)
 			//ruch potwora
 			if (canItMove(monster[0].x, monster[0].y, 0, 5))
 			{
-				monster[0].y += 4;
+				monster[0].y += 4.9;
 			}
 			if (canItMove(monster[1].x, monster[1].y, 0, 5))
 			{
@@ -455,7 +466,7 @@ int main(void)
 			if (player.mana >= 0 && player.mana <= 200)
 				player.mana += 0.4;
 
-			if (player.lives == 50)
+			if (player.lives <= 50)
 			{
 				al_draw_bitmap(endGame, 0, 0, 0);
 				al_flip_display();
