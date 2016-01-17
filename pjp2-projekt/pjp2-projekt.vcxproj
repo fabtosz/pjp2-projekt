@@ -89,6 +89,7 @@
     <Image Include="tiles.gif" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="collisions.h" />
     <ClInclude Include="objects.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

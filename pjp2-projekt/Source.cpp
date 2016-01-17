@@ -4,70 +4,24 @@
 #include <allegro5/allegro_font.h>
 #include <allegro5/allegro_ttf.h>
 #include "objects.h"
+#include "collisions.h"
 #include <math.h>
 #include <iostream>
 
 using namespace std;
 
-const int WIDTH = 600;
-const int HEIGHT = 500;
+const int WIDTH = 800;
+const int HEIGHT = 600;
 const int NUM_BULLETS = 3;
+const int NUM_MONSTERS = 5;
 
 bool keys[] = { false, false, false, false, false };
 enum KEYS{ UP, DOWN, LEFT, RIGHT, SPACE };
 
-//ogólne sprawdzenie kolizji
-bool isCollide(float pos1_x, float pos1_y, float size1_x, float size1_y, float pos2_x, float pos2_y, float size2_x, float size2_y)
-{
-	if ((pos1_x > pos2_x + size2_x - 1) || // is b1 on the right side of b2?
-		(pos1_y > pos2_y + size2_y - 1) || // is b1 under b2?
-		(pos2_x > pos1_x + size1_x - 1) || // is b2 on the right side of b1?
-		(pos2_y > pos1_y + size1_y - 1))   // is b2 under b1?
-	{
-		// brak kolizji
-		return 0;
-	}
-	// jest kolizja
-	return 1;
-}
-
-// Sprawdzenie kolizji gracza z bloczkiem
-// użycie isCollide z konkretnymi rozmiarami prostokątów
-bool isCollidePlayerTile(float player_x, float player_y, float tile_x, float tile_y)
-{
-	return isCollide(player_x, player_y, playerSizeX, playerSizeY, tile_x, tile_y, tileSize, tileSize);
-}
-
-bool canItMove(float player_x, float player_y,  /* współrzędne gracza */float x, float y /* o ile ruszyć */)
-{
-	bool collision = false;
-
-	//sprawdz kolizje dla każdego kloca
-	for (int i = 0; i < sizeArrayMap; i++)
-	{
-		//jeśli klocek jest powietrzem to go pomiń
-		if (map[i] != 0 && map[i] != 3)
-		{
-			if (isCollidePlayerTile(player_x + x, player_y + y, tileSize * (i % mapColumns), tileSize * (i / mapColumns)))
-			{
-				collision = true;
-				break;
-			}
-		}
-	}
-	return !collision;
-}
-bool isOnSolidGround(int player_x, int player_y)
-{
-	if (!canItMove(player_x, player_y, 0, 5))
-	{
-		return true;
-	}
-	else
-	{
-		return false;
-	}
-}
+bool isCollide(float pos1_x, float pos1_y, float size1_x, float size1_y, float pos2_x, float pos2_y, float size2_x, float size2_y);
+bool isCollidePlayerTile(float player_x, float player_y, float tile_x, float tile_y);
+bool canItMove(float player_x, float player_y,  /* współrzędne gracza */float x, float y /* o ile ruszyć */);
+bool isOnSolidGround(int player_x, int player_y);
 
 void InitBullet(Bullet bullet[], int size);
 void DrawBullet(Bullet bullet[], int size);
@@ -76,13 +30,14 @@ void UpdateBullet(Bullet bullet[], int size, Player &player);
 void MovePlayerRight(Player &player);
 void MovePlayerLeft(Player &player);
 
+void InitMonster(Monster monster[], int numMonsters, float x, float y);
+void MonsterGravity(Monster monster[], int numMonsters);
+
 int main(void)
 {
 	//variables
 	bool done = false;
 	bool render = false;
-
-
 
 	// zmienne sprite'a
 	const int maxFrame = 6;
@@ -138,18 +93,11 @@ int main(void)
 	// potwory
 	Monster monster[4];
 
-	// Współrzędne potwora 1
-	monster[0].x = 300;
-	monster[0].y = 100;
-	// Współrzędne potwora 2
-	monster[1].x = 1000;
-	monster[1].y = 200;
-	// Współrzędne potwora 3
-	monster[2].x = 800;
-	monster[2].y = 100;
-
-	monster[3].x = 1300;
-	monster[3].y = 100;
+	// Współrzędne potworow
+	InitMonster(monster, 0, 330, 450);
+	InitMonster(monster, 1, 1000, 200);
+	InitMonster(monster, 2, 800, 100);
+	InitMonster(monster, 3, 1300, 100);
 
 	spritePlayer[0] = al_load_bitmap("00.gif");
 	spritePlayer[1] = al_load_bitmap("01.gif");
@@ -174,14 +122,6 @@ int main(void)
 
 	al_register_event_source(event_queue, al_get_timer_event_source(timer));
 	al_register_event_source(event_queue, al_get_keyboard_event_source());
-
-	/*
-	splash = al_load_bitmap("splash.jpg");
-	al_draw_bitmap(splash, 0, 0, 0);
-	al_flip_display();
-
-	al_destroy_bitmap(splash);
-	*/
 
 	bool mayJumpAgain = true;
 	int wysokoscSkoku = 0;
@@ -345,10 +285,10 @@ int main(void)
 			}
 
 			//kolizja z przepascia
-			if (player.y > 550)
+			if (player.y > HEIGHT + 50)
 			{
 				player.alive = false;
-				player.lives -= 100;
+				player.lives -= 50;
 				player.y = 0;
 			}
 			player.alive = true;
@@ -427,32 +367,29 @@ int main(void)
 					al_draw_bitmap(spriteMonster[curFrame], monster[i].x + xOff, monster[i].y + yOff, 0);
 			}
 
-			//ruch potwora
-			if (canItMove(monster[0].x, monster[0].y, 0, 5))
+			for (int i = 0; i < 4; i++)
 			{
-				monster[0].y += 4.9;
-			}
-			if (canItMove(monster[1].x, monster[1].y, 0, 5))
-			{
-				monster[1].y += 4;
-			}
-			if (canItMove(monster[2].x, monster[2].y, 0, 5))
-			{
-				monster[2].y += 4;
-			}
-			if (canItMove(monster[0].x, monster[0].y, 0, 0))
-			{
-				monster[0].x -= 0.8*kierunek;
-			}
-			if (!canItMove(monster[0].x, monster[0].y, -5, 0))
-			{
-				kierunek = -1;
-			}
-			if (!canItMove(monster[0].x, monster[0].y, 5, 0))
-			{
-				kierunek = 1;
-			}
+				//grawitacja
+				if (canItMove(monster[i].x, monster[i].y, 0, 5))
+				{
+					monster[i].y += 5;
+				}
 
+				//ruch w boki
+				if (canItMove(monster[i].x, monster[i].y, 0, 0))
+				{
+					monster[i].x -= 2*monster[i].side;
+				}
+				if (!canItMove(monster[i].x, monster[i].y, -5, 0))
+				{
+					monster[i].side = -1;
+				}
+				if (!canItMove(monster[i].x, monster[i].y, 5, 0))
+				{
+					monster[i].side = 1;
+				}
+			}
+			
 
 			//pasek zycia
 			al_draw_filled_rectangle(50, 50, 200, 60, al_map_rgb(165, 0, 0));
@@ -491,6 +428,7 @@ int main(void)
 
 	return 0;
 }
+
 void MovePlayerRight(Player &player)
 {
 	if (canItMove(player.x, player.y, 5, 0))
@@ -555,4 +493,9 @@ void UpdateBullet(Bullet bullet[], int size, Player &player)
 
 		}
 	}
+}
+void InitMonster(Monster monster[], int indeks, float x, float y)
+{
+	monster[indeks].x = x;
+	monster[indeks].y = y;
 }
