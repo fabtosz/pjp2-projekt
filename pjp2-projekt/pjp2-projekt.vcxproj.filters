@@ -79,5 +79,8 @@
     <ClInclude Include="collisions.h">
       <Filter>Source Files</Filter>
     </ClInclude>
+    <ClInclude Include="movement.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

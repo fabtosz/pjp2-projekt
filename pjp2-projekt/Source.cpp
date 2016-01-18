@@ -5,6 +5,7 @@
 #include <allegro5/allegro_ttf.h>
 #include "objects.h"
 #include "collisions.h"
+#include "movement.h"
 #include <math.h>
 #include <iostream>
 
@@ -27,11 +28,11 @@ void InitBullet(Bullet bullet[], int size);
 void DrawBullet(Bullet bullet[], int size);
 void FireBullet(Bullet bullet[], int size, Player &player);
 void UpdateBullet(Bullet bullet[], int size, Player &player);
+
 void MovePlayerRight(Player &player);
 void MovePlayerLeft(Player &player);
 
 void InitMonster(Monster monster[], int numMonsters, float x, float y);
-void MonsterGravity(Monster monster[], int numMonsters);
 
 int main(void)
 {
@@ -56,8 +57,6 @@ int main(void)
 	ALLEGRO_BITMAP *mainPage = NULL;
 	ALLEGRO_BITMAP *endGame = NULL;
 
-	//	ALLEGRO_BITMAP *splash;
-
 	//program init
 	if (!al_init())										//initialize Allegro
 		return -1;
@@ -81,6 +80,10 @@ int main(void)
 	// gracz
 	Player player;
 
+	// grafiki menu
+	mainPage = al_load_bitmap("mainpage.jpg");
+	endGame = al_load_bitmap("death.jpg");
+
 	// Współrzędne początkowe gracza
 	player.x = 50;
 	player.y = 50;
@@ -91,13 +94,14 @@ int main(void)
 	InitBullet(bullets, NUM_BULLETS);
 
 	// potwory
-	Monster monster[4];
+	Monster monster[NUM_MONSTERS];
 
 	// Współrzędne potworow
 	InitMonster(monster, 0, 330, 450);
 	InitMonster(monster, 1, 1000, 200);
 	InitMonster(monster, 2, 800, 100);
 	InitMonster(monster, 3, 1300, 100);
+	InitMonster(monster, 4, 1600, 50);
 
 	spritePlayer[0] = al_load_bitmap("00.gif");
 	spritePlayer[1] = al_load_bitmap("01.gif");
@@ -126,12 +130,8 @@ int main(void)
 	bool mayJumpAgain = true;
 	int wysokoscSkoku = 0;
 	double kierunek = 1;
-
-	/* M E N U */
 	bool isStarted = false;
 
-	mainPage = al_load_bitmap("mainpage.jpg");
-	endGame = al_load_bitmap("death.jpg");
 	while (!isStarted)
 	{
 		al_draw_bitmap(mainPage, 0, 0, 0);
@@ -278,7 +278,7 @@ int main(void)
 			}
 
 			//kolizja gracza z potworami
-			for (int i = 0; i < 4; i++)
+			for (int i = 0; i < NUM_MONSTERS; i++)
 			{
 				if (isCollide(player.x, player.y, playerSizeX, playerSizeY, monster[i].x, monster[i].y, monster[i].sizeX, monster[i].sizeY) && player.alive)
 					player.lives--;
@@ -294,9 +294,9 @@ int main(void)
 			player.alive = true;
 
 			//kolizja pociskow z potworami
-			for (int i = 0; i < 3; i++)
+			for (int i = 0; i < NUM_BULLETS; i++)
 			{
-				for (int j = 0; j < 4; j++)
+				for (int j = 0; j < NUM_MONSTERS; j++)
 				{
 					if (isCollide(bullets[i].x, bullets[i].y, bullets[i].size, bullets[i].size, monster[j].x + xOff, monster[j].y + yOff, monster[j].sizeX, monster[j].sizeY))
 					{
@@ -319,6 +319,43 @@ int main(void)
 				}
 			}
 
+			//grawitacja potworow
+			for (int i = 0; i < NUM_MONSTERS; i++)
+			{
+				//grawitacja
+				if (!isOnSolidGround(monster[i].x, monster[i].y))
+				{
+					if (canItMove(monster[i].x, monster[i].y, 0, 5))
+					{
+						monster[i].y += 5;
+					}
+				}
+			}
+			//ruch potworow z odbiciem
+			for (int i = 0; i < NUM_MONSTERS; i++)
+			{
+				//grawitacja
+				if (!isOnSolidGround(monster[i].x, monster[i].y))
+				{
+					if (canItMove(monster[i].x, monster[i].y, 0, 5))
+					{
+						monster[i].y += 5;
+					}
+				}
+				//ruch w boki
+				if (canItMove(monster[i].x, monster[i].y, 0, 0))
+				{
+					monster[i].x -= 2 * monster[i].side;
+				}
+				if (!canItMove(monster[i].x, monster[i].y, -5, 0))
+				{
+					monster[i].side = -1;
+				}
+				if (!canItMove(monster[i].x, monster[i].y, 5, 0) )
+				{
+					monster[i].side = 1;
+				}
+			}
 
 			//przeliczenie współrzędnych mapy
 			//gracz z prawej
@@ -347,10 +384,9 @@ int main(void)
 
 			//rysuj bloczki
 			for (int i = 0; i < sizeArrayMap; i++)
-			{
 				al_draw_bitmap_region(bgTiles, tileSize * map[i], 0, tileSize, tileSize,
 					xOff + tileSize * (i % mapColumns), yOff + tileSize * (i / mapColumns), 0);
-			}
+
 
 			//rysuj gracza
 			if(player.alive)
@@ -361,35 +397,11 @@ int main(void)
 			UpdateBullet(bullets, NUM_BULLETS, player);
 
 			//rysuj potwory
-			for (int i = 0; i < 4; i++)
+			for (int i = 0; i < NUM_MONSTERS; i++)
 			{
 				if (monster[i].alive)
 					al_draw_bitmap(spriteMonster[curFrame], monster[i].x + xOff, monster[i].y + yOff, 0);
 			}
-
-			for (int i = 0; i < 4; i++)
-			{
-				//grawitacja
-				if (canItMove(monster[i].x, monster[i].y, 0, 5))
-				{
-					monster[i].y += 5;
-				}
-
-				//ruch w boki
-				if (canItMove(monster[i].x, monster[i].y, 0, 0))
-				{
-					monster[i].x -= 2*monster[i].side;
-				}
-				if (!canItMove(monster[i].x, monster[i].y, -5, 0))
-				{
-					monster[i].side = -1;
-				}
-				if (!canItMove(monster[i].x, monster[i].y, 5, 0))
-				{
-					monster[i].side = 1;
-				}
-			}
-			
 
 			//pasek zycia
 			al_draw_filled_rectangle(50, 50, 200, 60, al_map_rgb(165, 0, 0));
@@ -429,22 +441,7 @@ int main(void)
 	return 0;
 }
 
-void MovePlayerRight(Player &player)
-{
-	if (canItMove(player.x, player.y, 5, 0))
-	{
-		player.x += 5;
-		player.side = 1;
-	}
-}
-void MovePlayerLeft(Player &player)
-{
-	if (canItMove(player.x, player.y, -5, 0))
-	{
-		player.x -= 5;
-		player.side = -1;
-	}
-}
+
 void InitBullet(Bullet bullet[], int size)
 {
 	for (int i = 0; i < size; i++)

@@ -18,7 +18,10 @@ bool isCollidePlayerTile(float player_x, float player_y, float tile_x, float til
 {
 	return isCollide(player_x, player_y, playerSizeX, playerSizeY, tile_x, tile_y, tileSize, tileSize);
 }
-
+bool isCollidePlayerGem(float player_x, float player_y, float tile_x, float tile_y)
+{
+	return isCollide(player_x, player_y, playerSizeX, playerSizeY, tile_x, tile_y, gemSize, gemSize);
+}
 bool canItMove(float player_x, float player_y,  /* wspó³rzêdne gracza */float x, float y /* o ile ruszyæ */)
 {
 	bool collision = false;
@@ -27,12 +30,20 @@ bool canItMove(float player_x, float player_y,  /* wspó³rzêdne gracza */float x,
 	for (int i = 0; i < sizeArrayMap; i++)
 	{
 		//jeœli klocek jest powietrzem to go pomiñ
-		if (map[i] != 0 && map[i] != 3)
+		if (map[i] != 0 && map[i] != 4 && map[i] != 3)
 		{
 			if (isCollidePlayerTile(player_x + x, player_y + y, tileSize * (i % mapColumns), tileSize * (i / mapColumns)))
 			{
 				collision = true;
 				break;
+			}
+		}
+		//jeœli klocek jest diamentem
+		if (map[i] == 4)
+		{
+			if (isCollidePlayerGem(player_x + x, player_y + y, tileSize * (i % mapColumns), tileSize * (i / mapColumns)))
+			{
+				map[i] = 0;
 			}
 		}
 	}
