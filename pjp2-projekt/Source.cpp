@@ -6,9 +6,6 @@
 #include "objects.h"
 #include "collisions.h"
 #include "movement.h"
-#include "decorations.h"
-#include <math.h>
-#include <iostream>
 
 using namespace std;
 
@@ -53,14 +50,17 @@ int main(void)
 	ALLEGRO_TIMER *timer;
 	ALLEGRO_BITMAP *bgTiles = NULL;
 	ALLEGRO_BITMAP *bgClouds = NULL;
-	ALLEGRO_BITMAP *spritePlayer[maxFrame];
-	ALLEGRO_BITMAP *spriteMonster[maxFrame];
+	ALLEGRO_BITMAP *player_r = NULL;
+	ALLEGRO_BITMAP *player_l = NULL;
+	ALLEGRO_BITMAP *monster_r = NULL;
+	ALLEGRO_BITMAP *monster_l = NULL;
 	ALLEGRO_BITMAP *mainPage = NULL;
 	ALLEGRO_BITMAP *endGame = NULL;
 	ALLEGRO_BITMAP *gem1 = NULL;
 	ALLEGRO_BITMAP *gem2 = NULL;
 	ALLEGRO_BITMAP *gem3 = NULL;
 	ALLEGRO_BITMAP *gem4 = NULL;
+	ALLEGRO_BITMAP *fire = NULL;
 
 	//program init
 	if (!al_init())										//initialize Allegro
@@ -79,19 +79,21 @@ int main(void)
 	al_init_primitives_addon();
 
 	// plansza
-	bgTiles = al_load_bitmap("tiles.gif");
-	bgClouds = al_load_bitmap("clouds.png");
-	gem1 = al_load_bitmap("gem1.png");
-	gem2 = al_load_bitmap("gem2.png");
-	gem3 = al_load_bitmap("gem3.png");
-	gem4 = al_load_bitmap("gem4.png");
+	bgTiles = al_load_bitmap("images/tiles.gif");
+	bgClouds = al_load_bitmap("images/background.png");
+	gem1 = al_load_bitmap("images/gem1.png");
+	gem2 = al_load_bitmap("images/gem2.png");
+	gem3 = al_load_bitmap("images/gem3.png");
+	gem4 = al_load_bitmap("images/gem4.png");
 
 	// gracz
 	Player player;
+	player_r = al_load_bitmap("images/player_r.gif");
+	player_l = al_load_bitmap("images/player_l.gif");
 
 	// grafiki menu
-	mainPage = al_load_bitmap("mainpage.jpg");
-	endGame = al_load_bitmap("death.jpg");
+	mainPage = al_load_bitmap("images/mainpage.jpg");
+	endGame = al_load_bitmap("images/death.jpg");
 
 	// Współrzędne początkowe gracza
 	player.x = 50;
@@ -99,36 +101,21 @@ int main(void)
 
 	// pociski
 	Bullet bullets[NUM_BULLETS];
-
 	InitBullet(bullets, NUM_BULLETS);
 
-	// potwory
+	// potwory i przeszkody
 	Monster monster[NUM_MONSTERS];
+	monster_r = al_load_bitmap("images/monster_r.gif");
+	monster_l = al_load_bitmap("images/monster_l.gif");
+	fire = al_load_bitmap("images/fire.gif");
 
 	// Współrzędne potworow
 
-	//InitMonster(monster, 0, 100, 0);
-	//InitMonster(monster, 1, 1000, 200);
-	//InitMonster(monster, 2, 800, 100);
-	//InitMonster(monster, 3, 1300, 100);
-	//InitMonster(monster, 4, 1600, 50);
-
-	spritePlayer[0] = al_load_bitmap("00.gif");
-	spritePlayer[1] = al_load_bitmap("01.gif");
-	spritePlayer[2] = al_load_bitmap("02.gif");
-	spritePlayer[3] = al_load_bitmap("03.gif");
-	spritePlayer[4] = al_load_bitmap("04.gif");
-	spritePlayer[5] = al_load_bitmap("05.gif");
-
-	spriteMonster[0] = al_load_bitmap("monster00.gif");
-	spriteMonster[1] = al_load_bitmap("monster01.gif");
-	spriteMonster[2] = al_load_bitmap("monster02.gif");
-	spriteMonster[3] = al_load_bitmap("monster03.gif");
-	spriteMonster[4] = al_load_bitmap("monster04.gif");
-	spriteMonster[5] = al_load_bitmap("monster05.gif");
-
-	for (int i = 0; i < maxFrame; i++)
-		al_convert_mask_to_alpha(spritePlayer[i], al_map_rgb(106, 76, 48));
+	InitMonster(monster, 0, 100, 0);
+	InitMonster(monster, 1, 1000, 100);
+	InitMonster(monster, 2, 800, 100);
+	InitMonster(monster, 3, 1300, 100);
+	InitMonster(monster, 4, 1600, 50);
 
 	// kolejka zdarzen
 	event_queue = al_create_event_queue();
@@ -374,28 +361,35 @@ int main(void)
 			{
 				al_draw_bitmap_region(bgTiles, tileSize * map[i], 0, tileSize, tileSize,
 					xOff + tileSize * (i % mapColumns), yOff + tileSize * (i / mapColumns), 0);
-				if (map[i] == 4)
+
+				//skarby
+				switch (map[i])
 				{
-					al_draw_bitmap_region(gem1, curFrame * 50, 0, 50, 50,/*gdzie rysowac*/ xOff + tileSize * (i % mapColumns), yOff + tileSize * (i / mapColumns), 0);
-				}
-				if (map[i] == 5)
-				{
-					al_draw_bitmap_region(gem2, curFrame * 50, 0, 50, 50,/*gdzie rysowac*/ xOff + tileSize * (i % mapColumns), yOff + tileSize * (i / mapColumns), 0);
-				}
-				if (map[i] == 6)
-				{
-					al_draw_bitmap_region(gem3, curFrame * 50, 0, 50, 50,/*gdzie rysowac*/ xOff + tileSize * (i % mapColumns), yOff + tileSize * (i / mapColumns), 0);
-				}
-				if (map[i] == 7)
-				{
-					al_draw_bitmap_region(gem4, curFrame * 50, 0, 50, 50,/*gdzie rysowac*/ xOff + tileSize * (i % mapColumns), yOff + tileSize * (i / mapColumns), 0);
+					case 4:
+						al_draw_bitmap_region(gem1, curFrame * 50, 0, 50, 50,/*gdzie rysowac*/ xOff + tileSize * (i % mapColumns), yOff + tileSize * (i / mapColumns), 0);
+						break;
+					case 5:
+						al_draw_bitmap_region(gem2, curFrame * 50, 0, 50, 50,/*gdzie rysowac*/ xOff + tileSize * (i % mapColumns), yOff + tileSize * (i / mapColumns), 0);
+						break;
+					case 6:
+						al_draw_bitmap_region(gem3, curFrame * 50, 0, 50, 50,/*gdzie rysowac*/ xOff + tileSize * (i % mapColumns), yOff + tileSize * (i / mapColumns), 0);
+						break;
+					case 7:
+						al_draw_bitmap_region(gem4, curFrame * 50, 0, 50, 50,/*gdzie rysowac*/ xOff + tileSize * (i % mapColumns), yOff + tileSize * (i / mapColumns), 0);
+						break;
 				}
 			}
 				
-
 			//rysuj gracza
-			if(player.alive)
-				al_draw_bitmap(spritePlayer[curFrame], player.x + xOff, player.y + yOff, 0);
+			if (player.alive)
+			{
+				if (player.dir == 1)
+					al_draw_bitmap_region(player_r, curFrame * 70, 0, 70, 94,/*gdzie rysowac*/ player.x + xOff, player.y + yOff, 0);
+				if (player.dir == -1)
+					al_draw_bitmap_region(player_l, curFrame * 70, 0, 70, 94,/*gdzie rysowac*/ player.x + xOff, player.y + yOff, 0);
+			}
+				//al_draw_bitmap(spritePlayer[curFrame], player.x + xOff, player.y + yOff, 0);
+				
 
 			//rysuj pociski
 			DrawBullet(bullets, NUM_BULLETS);
@@ -405,7 +399,12 @@ int main(void)
 			for (int i = 0; i < NUM_MONSTERS; i++)
 			{
 				if (monster[i].alive)
-					al_draw_bitmap(spriteMonster[curFrame], monster[i].x + xOff, monster[i].y + yOff, 0);
+				{
+					if (monster[i].side == 1)
+						al_draw_bitmap_region(monster_l, curFrame * 53, 0, 53, 85,/*gdzie rysowac*/ monster[i].x + xOff, monster[i].y + yOff, 0);
+					if (monster[i].side == -1)																			 
+						al_draw_bitmap_region(monster_r, curFrame * 53, 0, 53, 85,/*gdzie rysowac*/ monster[i].x + xOff, monster[i].y + yOff, 0);
+				}
 			}
 
 			//pasek zycia
@@ -433,15 +432,13 @@ int main(void)
 		}
 	}
 
-	for (int i = 0; i < maxFrame; i++)
-		al_destroy_bitmap(spritePlayer[i]);
-
 	al_destroy_bitmap(bgClouds);
 	al_destroy_bitmap(bgTiles);
-	al_destroy_event_queue(event_queue);
-	al_destroy_display(display);
 	al_destroy_bitmap(mainPage);
 	al_destroy_bitmap(endGame);
+	al_destroy_event_queue(event_queue);
+	al_destroy_display(display);
+	
 
 	return 0;
 }

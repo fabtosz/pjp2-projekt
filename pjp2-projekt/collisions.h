@@ -46,7 +46,6 @@ bool canItMove(float player_x, float player_y,  /* wspó³rzêdne gracza */float x,
 			if (isCollidePlayerGem(player_x + x, player_y + y, tileSize * (i % mapColumns), tileSize * (i / mapColumns)))
 			{
 				map[i] = 0;
-				std::cout << "B A N G!" << std::endl;
 			}
 		}
 	}

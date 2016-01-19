@@ -70,29 +70,24 @@
     <ClCompile Include="Source.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <Image Include="00.gif" />
-    <Image Include="01.gif" />
-    <Image Include="02.gif" />
-    <Image Include="03.gif" />
-    <Image Include="04.gif" />
-    <Image Include="05.gif" />
-    <Image Include="clouds.png" />
-    <Image Include="death.jpg" />
-    <Image Include="mainpage.jpg" />
-    <Image Include="monster00.gif" />
-    <Image Include="monster01.gif" />
-    <Image Include="monster02.gif" />
-    <Image Include="monster03.gif" />
-    <Image Include="monster04.gif" />
-    <Image Include="monster05.gif" />
-    <Image Include="splash.jpg" />
-    <Image Include="tiles.gif" />
-  </ItemGroup>
-  <ItemGroup>
     <ClInclude Include="collisions.h" />
-    <ClInclude Include="decorations.h" />
     <ClInclude Include="movement.h" />
     <ClInclude Include="objects.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="images\background.png" />
+    <Image Include="images\death.jpg" />
+    <Image Include="images\fire.gif" />
+    <Image Include="images\gem1.png" />
+    <Image Include="images\gem2.png" />
+    <Image Include="images\gem3.png" />
+    <Image Include="images\gem4.png" />
+    <Image Include="images\mainpage.jpg" />
+    <Image Include="images\monster_l.gif" />
+    <Image Include="images\monster_r.gif" />
+    <Image Include="images\player_l.gif" />
+    <Image Include="images\player_r.gif" />
+    <Image Include="images\tiles.gif" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

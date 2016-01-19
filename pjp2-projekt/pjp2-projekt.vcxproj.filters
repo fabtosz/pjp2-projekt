@@ -13,64 +13,14 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
+    <Filter Include="Source Files\images">
+      <UniqueIdentifier>{ce37977c-e4b1-4cdd-b542-7361398ceb40}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Source.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-  </ItemGroup>
-  <ItemGroup>
-    <Image Include="00.gif">
-      <Filter>Source Files</Filter>
-    </Image>
-    <Image Include="01.gif">
-      <Filter>Source Files</Filter>
-    </Image>
-    <Image Include="02.gif">
-      <Filter>Source Files</Filter>
-    </Image>
-    <Image Include="03.gif">
-      <Filter>Source Files</Filter>
-    </Image>
-    <Image Include="04.gif">
-      <Filter>Source Files</Filter>
-    </Image>
-    <Image Include="05.gif">
-      <Filter>Source Files</Filter>
-    </Image>
-    <Image Include="splash.jpg">
-      <Filter>Source Files</Filter>
-    </Image>
-    <Image Include="clouds.png">
-      <Filter>Source Files</Filter>
-    </Image>
-    <Image Include="tiles.gif">
-      <Filter>Source Files</Filter>
-    </Image>
-    <Image Include="monster00.gif">
-      <Filter>Source Files</Filter>
-    </Image>
-    <Image Include="monster01.gif">
-      <Filter>Source Files</Filter>
-    </Image>
-    <Image Include="monster02.gif">
-      <Filter>Source Files</Filter>
-    </Image>
-    <Image Include="monster03.gif">
-      <Filter>Source Files</Filter>
-    </Image>
-    <Image Include="monster04.gif">
-      <Filter>Source Files</Filter>
-    </Image>
-    <Image Include="monster05.gif">
-      <Filter>Source Files</Filter>
-    </Image>
-    <Image Include="death.jpg">
-      <Filter>Source Files</Filter>
-    </Image>
-    <Image Include="mainpage.jpg">
-      <Filter>Source Files</Filter>
-    </Image>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="objects.h">
@@ -82,8 +32,46 @@
     <ClInclude Include="movement.h">
       <Filter>Source Files</Filter>
     </ClInclude>
-    <ClInclude Include="decorations.h">
-      <Filter>Source Files</Filter>
-    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="images\background.png">
+      <Filter>Source Files\images</Filter>
+    </Image>
+    <Image Include="images\death.jpg">
+      <Filter>Source Files\images</Filter>
+    </Image>
+    <Image Include="images\fire.gif">
+      <Filter>Source Files\images</Filter>
+    </Image>
+    <Image Include="images\gem1.png">
+      <Filter>Source Files\images</Filter>
+    </Image>
+    <Image Include="images\gem2.png">
+      <Filter>Source Files\images</Filter>
+    </Image>
+    <Image Include="images\gem3.png">
+      <Filter>Source Files\images</Filter>
+    </Image>
+    <Image Include="images\gem4.png">
+      <Filter>Source Files\images</Filter>
+    </Image>
+    <Image Include="images\mainpage.jpg">
+      <Filter>Source Files\images</Filter>
+    </Image>
+    <Image Include="images\monster_l.gif">
+      <Filter>Source Files\images</Filter>
+    </Image>
+    <Image Include="images\monster_r.gif">
+      <Filter>Source Files\images</Filter>
+    </Image>
+    <Image Include="images\player_l.gif">
+      <Filter>Source Files\images</Filter>
+    </Image>
+    <Image Include="images\player_r.gif">
+      <Filter>Source Files\images</Filter>
+    </Image>
+    <Image Include="images\tiles.gif">
+      <Filter>Source Files\images</Filter>
+    </Image>
   </ItemGroup>
 </Project>
