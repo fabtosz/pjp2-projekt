@@ -82,5 +82,8 @@
     <ClInclude Include="movement.h">
       <Filter>Source Files</Filter>
     </ClInclude>
+    <ClInclude Include="decorations.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

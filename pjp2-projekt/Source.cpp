@@ -6,12 +6,13 @@
 #include "objects.h"
 #include "collisions.h"
 #include "movement.h"
+#include "decorations.h"
 #include <math.h>
 #include <iostream>
 
 using namespace std;
 
-const int WIDTH = 800;
+const int WIDTH = 900;
 const int HEIGHT = 600;
 const int NUM_BULLETS = 3;
 const int NUM_MONSTERS = 5;
@@ -56,6 +57,10 @@ int main(void)
 	ALLEGRO_BITMAP *spriteMonster[maxFrame];
 	ALLEGRO_BITMAP *mainPage = NULL;
 	ALLEGRO_BITMAP *endGame = NULL;
+	ALLEGRO_BITMAP *gem1 = NULL;
+	ALLEGRO_BITMAP *gem2 = NULL;
+	ALLEGRO_BITMAP *gem3 = NULL;
+	ALLEGRO_BITMAP *gem4 = NULL;
 
 	//program init
 	if (!al_init())										//initialize Allegro
@@ -76,6 +81,10 @@ int main(void)
 	// plansza
 	bgTiles = al_load_bitmap("tiles.gif");
 	bgClouds = al_load_bitmap("clouds.png");
+	gem1 = al_load_bitmap("gem1.png");
+	gem2 = al_load_bitmap("gem2.png");
+	gem3 = al_load_bitmap("gem3.png");
+	gem4 = al_load_bitmap("gem4.png");
 
 	// gracz
 	Player player;
@@ -97,11 +106,12 @@ int main(void)
 	Monster monster[NUM_MONSTERS];
 
 	// Współrzędne potworow
-	InitMonster(monster, 0, 330, 450);
-	InitMonster(monster, 1, 1000, 200);
-	InitMonster(monster, 2, 800, 100);
-	InitMonster(monster, 3, 1300, 100);
-	InitMonster(monster, 4, 1600, 50);
+
+	//InitMonster(monster, 0, 100, 0);
+	//InitMonster(monster, 1, 1000, 200);
+	//InitMonster(monster, 2, 800, 100);
+	//InitMonster(monster, 3, 1300, 100);
+	//InitMonster(monster, 4, 1600, 50);
 
 	spritePlayer[0] = al_load_bitmap("00.gif");
 	spritePlayer[1] = al_load_bitmap("01.gif");
@@ -332,30 +342,7 @@ int main(void)
 				}
 			}
 			//ruch potworow z odbiciem
-			for (int i = 0; i < NUM_MONSTERS; i++)
-			{
-				//grawitacja
-				if (!isOnSolidGround(monster[i].x, monster[i].y))
-				{
-					if (canItMove(monster[i].x, monster[i].y, 0, 5))
-					{
-						monster[i].y += 5;
-					}
-				}
-				//ruch w boki
-				if (canItMove(monster[i].x, monster[i].y, 0, 0))
-				{
-					monster[i].x -= 2 * monster[i].side;
-				}
-				if (!canItMove(monster[i].x, monster[i].y, -5, 0))
-				{
-					monster[i].side = -1;
-				}
-				if (!canItMove(monster[i].x, monster[i].y, 5, 0) )
-				{
-					monster[i].side = 1;
-				}
-			}
+			MonsterMove(monster, NUM_MONSTERS);
 
 			//przeliczenie współrzędnych mapy
 			//gracz z prawej
@@ -382,11 +369,29 @@ int main(void)
 			//rysuj tlo
 			al_draw_bitmap(bgClouds, 0 + xOff / 8, 0, 0);
 
-			//rysuj bloczki
+			//rysuj mapę
 			for (int i = 0; i < sizeArrayMap; i++)
+			{
 				al_draw_bitmap_region(bgTiles, tileSize * map[i], 0, tileSize, tileSize,
 					xOff + tileSize * (i % mapColumns), yOff + tileSize * (i / mapColumns), 0);
-
+				if (map[i] == 4)
+				{
+					al_draw_bitmap_region(gem1, curFrame * 50, 0, 50, 50,/*gdzie rysowac*/ xOff + tileSize * (i % mapColumns), yOff + tileSize * (i / mapColumns), 0);
+				}
+				if (map[i] == 5)
+				{
+					al_draw_bitmap_region(gem2, curFrame * 50, 0, 50, 50,/*gdzie rysowac*/ xOff + tileSize * (i % mapColumns), yOff + tileSize * (i / mapColumns), 0);
+				}
+				if (map[i] == 6)
+				{
+					al_draw_bitmap_region(gem3, curFrame * 50, 0, 50, 50,/*gdzie rysowac*/ xOff + tileSize * (i % mapColumns), yOff + tileSize * (i / mapColumns), 0);
+				}
+				if (map[i] == 7)
+				{
+					al_draw_bitmap_region(gem4, curFrame * 50, 0, 50, 50,/*gdzie rysowac*/ xOff + tileSize * (i % mapColumns), yOff + tileSize * (i / mapColumns), 0);
+				}
+			}
+				
 
 			//rysuj gracza
 			if(player.alive)
@@ -470,6 +475,7 @@ void FireBullet(Bullet bullet[], int size, Player &player)
 			bullet[i].x = player.x + 17 + xOff;
 			bullet[i].y = player.y + 17;
 			bullet[i].alive = true;
+			bullet[i].dir = player.dir;
 			break;
 		}
 	}
@@ -480,7 +486,7 @@ void UpdateBullet(Bullet bullet[], int size, Player &player)
 	{
 		if (bullet[i].alive)
 		{
-			bullet[i].x += bullet[i].speed;
+			bullet[i].x += bullet[i].speed * bullet[i].dir;
 			if (bullet[i].x > WIDTH || bullet[i].x < 0)
 			{
 				bullet[i].alive = false;
