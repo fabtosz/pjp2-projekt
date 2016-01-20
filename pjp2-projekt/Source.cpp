@@ -14,7 +14,7 @@ using namespace std;
 const int WIDTH = 900;
 const int HEIGHT = 600;
 const int NUM_BULLETS = 3;
-const int NUM_MONSTERS = 5;
+const int NUM_MONSTERS = 3;
 
 bool keys[] = { false, false, false, false, false };
 enum KEYS{ UP, DOWN, LEFT, RIGHT, SPACE };
@@ -103,7 +103,7 @@ int main(void)
 
 	// Współrzędne początkowe gracza
 	player.x = 50;
-	player.y = 50;
+	player.y = 200;
 
 	// pociski
 	Bullet bullets[NUM_BULLETS];
@@ -116,11 +116,11 @@ int main(void)
 	fire = al_load_bitmap("images/fire.gif");
 
 	// Współrzędne potworow
-	InitMonster(monster, 0, 100, 0);
-	InitMonster(monster, 1, 1000, 100);
-	InitMonster(monster, 2, 800, 100);
-	InitMonster(monster, 3, 1300, 100);
-	InitMonster(monster, 4, 1600, 50);
+	InitMonster(monster, 0, 400, 400);
+	InitMonster(monster, 1, 800, 400);
+	InitMonster(monster, 2, 1400, 400);
+	//InitMonster(monster, 3, 1300, 100);
+	//InitMonster(monster, 4, 1600, 50);
 
 	// kolejka zdarzen i timer
 	event_queue = al_create_event_queue();
@@ -337,7 +337,7 @@ int main(void)
 			}
 
 			//warunek zwyciestwa
-			if ((player.x + player.x + xOff) > 3000)
+			if ((player.x + player.x + xOff) > 8000)
 			{
 				al_draw_bitmap(victory, 0, 0, 0);
 				al_flip_display();
@@ -354,7 +354,8 @@ int main(void)
 			render = false;
 
 			//rysuj tlo
-			al_draw_bitmap(bgClouds, 0 + xOff / 8, 0, 0);
+			//al_draw_bitmap(bgClouds, 0 + xOff / 8, 0, 0);
+			al_draw_bitmap(bgClouds, 0, 0, 0);
 
 			//rysuj mapę
 			for (int i = 0; i < sizeArrayMap; i++)
@@ -424,7 +425,7 @@ int main(void)
 			{
 				al_draw_bitmap(endGame, 0, 0, 0);
 				al_flip_display();
-				al_rest(3.0);
+				al_rest(5.0);
 				done = true;
 			}
 
@@ -437,6 +438,16 @@ int main(void)
 	al_destroy_bitmap(bgTiles);
 	al_destroy_bitmap(mainPage);
 	al_destroy_bitmap(endGame);
+	al_destroy_bitmap(victory);
+	al_destroy_bitmap(monster_l);
+	al_destroy_bitmap(monster_r);
+	al_destroy_bitmap(player_l);
+	al_destroy_bitmap(player_r);
+	al_destroy_bitmap(gem1);
+	al_destroy_bitmap(gem2);
+	al_destroy_bitmap(gem3);
+	al_destroy_bitmap(gem4);
+	al_destroy_bitmap(fire);
 	al_destroy_event_queue(event_queue);
 	al_destroy_display(display);
 	
