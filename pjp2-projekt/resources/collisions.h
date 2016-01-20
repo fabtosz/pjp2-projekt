@@ -32,7 +32,7 @@ bool canItMove(float player_x, float player_y,  /* wspó³rzêdne gracza */float x,
 	for (int i = 0; i < sizeArrayMap; i++)
 	{
 		//jeœli klocek jest powietrzem to go pomiñ
-		if (map[i] != 0 && map[i] != 3 && map[i] != 4 && map[i] != 5 && map[i] != 6 && map[i] != 7)
+		if (map[i] != 0  && map[i] != 5 && map[i] != 6 && map[i] != 7 && map[i] != 8)
 		{
 			if (isCollidePlayerTile(player_x + x, player_y + y, tileSize * (i % mapColumns), tileSize * (i / mapColumns)))
 			{
@@ -41,7 +41,7 @@ bool canItMove(float player_x, float player_y,  /* wspó³rzêdne gracza */float x,
 			}
 		}
 		//jeœli klocek jest itemem(diamentem, potionem)
-		if (map[i] == 4 || map[i] == 5 || map[i] == 6 || map[i] == 7)
+		if (map[i] == 5 || map[i] == 6 || map[i] == 7 || map[i] == 8)
 		{
 			if (isCollidePlayerGem(player_x + x, player_y + y, tileSize * (i % mapColumns), tileSize * (i / mapColumns)))
 			{

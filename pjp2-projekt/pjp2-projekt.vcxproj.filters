@@ -16,6 +16,9 @@
     <Filter Include="Source Files\images">
       <UniqueIdentifier>{ce37977c-e4b1-4cdd-b542-7361398ceb40}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\resources">
+      <UniqueIdentifier>{c53d50bb-88c0-4c97-9a40-ccedb9b5657f}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Source.cpp">
@@ -23,14 +26,17 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="objects.h">
-      <Filter>Source Files</Filter>
+    <ClInclude Include="resources\collisions.h">
+      <Filter>Source Files\resources</Filter>
     </ClInclude>
-    <ClInclude Include="collisions.h">
-      <Filter>Source Files</Filter>
+    <ClInclude Include="resources\main_menu.h">
+      <Filter>Source Files\resources</Filter>
     </ClInclude>
-    <ClInclude Include="movement.h">
-      <Filter>Source Files</Filter>
+    <ClInclude Include="resources\movement.h">
+      <Filter>Source Files\resources</Filter>
+    </ClInclude>
+    <ClInclude Include="resources\objects.h">
+      <Filter>Source Files\resources</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -71,6 +77,9 @@
       <Filter>Source Files\images</Filter>
     </Image>
     <Image Include="images\tiles.gif">
+      <Filter>Source Files\images</Filter>
+    </Image>
+    <Image Include="images\victory.jpg">
       <Filter>Source Files\images</Filter>
     </Image>
   </ItemGroup>

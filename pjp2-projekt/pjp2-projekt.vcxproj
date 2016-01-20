@@ -70,9 +70,10 @@
     <ClCompile Include="Source.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="collisions.h" />
-    <ClInclude Include="movement.h" />
-    <ClInclude Include="objects.h" />
+    <ClInclude Include="resources\collisions.h" />
+    <ClInclude Include="resources\main_menu.h" />
+    <ClInclude Include="resources\movement.h" />
+    <ClInclude Include="resources\objects.h" />
   </ItemGroup>
   <ItemGroup>
     <Image Include="images\background.png" />
@@ -88,6 +89,7 @@
     <Image Include="images\player_l.gif" />
     <Image Include="images\player_r.gif" />
     <Image Include="images\tiles.gif" />
+    <Image Include="images\victory.jpg" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

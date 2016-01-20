@@ -3,12 +3,14 @@
 #include <allegro5/allegro_primitives.h>
 #include <allegro5/allegro_font.h>
 #include <allegro5/allegro_ttf.h>
-#include "objects.h"
-#include "collisions.h"
-#include "movement.h"
+#include "resources/objects.h"
+#include "resources/collisions.h"
+#include "resources/movement.h"
+#include "resources/main_menu.h"
 
 using namespace std;
 
+//stałe
 const int WIDTH = 900;
 const int HEIGHT = 600;
 const int NUM_BULLETS = 3;
@@ -16,6 +18,8 @@ const int NUM_MONSTERS = 5;
 
 bool keys[] = { false, false, false, false, false };
 enum KEYS{ UP, DOWN, LEFT, RIGHT, SPACE };
+
+void ShowMainMenu(bool isStarted, ALLEGRO_BITMAP *mainPage, bool done, ALLEGRO_EVENT_QUEUE *event_queue);
 
 bool isCollide(float pos1_x, float pos1_y, float size1_x, float size1_y, float pos2_x, float pos2_y, float size2_x, float size2_y);
 bool isCollidePlayerTile(float player_x, float player_y, float tile_x, float tile_y);
@@ -56,6 +60,7 @@ int main(void)
 	ALLEGRO_BITMAP *monster_l = NULL;
 	ALLEGRO_BITMAP *mainPage = NULL;
 	ALLEGRO_BITMAP *endGame = NULL;
+	ALLEGRO_BITMAP *victory = NULL;
 	ALLEGRO_BITMAP *gem1 = NULL;
 	ALLEGRO_BITMAP *gem2 = NULL;
 	ALLEGRO_BITMAP *gem3 = NULL;
@@ -94,6 +99,7 @@ int main(void)
 	// grafiki menu
 	mainPage = al_load_bitmap("images/mainpage.jpg");
 	endGame = al_load_bitmap("images/death.jpg");
+	victory = al_load_bitmap("images/victory.jpg");
 
 	// Współrzędne początkowe gracza
 	player.x = 50;
@@ -110,49 +116,26 @@ int main(void)
 	fire = al_load_bitmap("images/fire.gif");
 
 	// Współrzędne potworow
-
 	InitMonster(monster, 0, 100, 0);
 	InitMonster(monster, 1, 1000, 100);
 	InitMonster(monster, 2, 800, 100);
 	InitMonster(monster, 3, 1300, 100);
 	InitMonster(monster, 4, 1600, 50);
 
-	// kolejka zdarzen
+	// kolejka zdarzen i timer
 	event_queue = al_create_event_queue();
 	timer = al_create_timer(1.0 / 60);
-
 	al_register_event_source(event_queue, al_get_timer_event_source(timer));
 	al_register_event_source(event_queue, al_get_keyboard_event_source());
 
-	bool mayJumpAgain = true;
+	
 	int wysokoscSkoku = 0;
-	double kierunek = 1;
+	int points = 0;
 	bool isStarted = false;
+	bool mayJumpAgain = true;
 
-	while (!isStarted)
-	{
-		al_draw_bitmap(mainPage, 0, 0, 0);
-		al_flip_display();
+	ShowMainMenu(isStarted, mainPage, done, event_queue);
 
-		ALLEGRO_EVENT ev;
-		al_wait_for_event(event_queue, &ev);
-
-		if (ev.type == ALLEGRO_EVENT_KEY_DOWN)
-		{
-			switch (ev.keyboard.keycode)
-			{
-			case ALLEGRO_KEY_ESCAPE:
-				isStarted = true;
-				done = true;
-				break;
-			case ALLEGRO_KEY_ENTER:
-				isStarted = true;
-				break;
-			}
-		}
-	}
-
-	/* * * * * * * * * * * * */
 	al_start_timer(timer);
 
 	while (!done)
@@ -328,6 +311,14 @@ int main(void)
 					}
 				}
 			}
+
+			//kolizja potworow z przepascia
+			for (int i = 0; i < NUM_MONSTERS; i++)
+			{
+				if (monster[i].y > HEIGHT)
+					monster[i].alive = false;
+			}
+
 			//ruch potworow z odbiciem
 			MonsterMove(monster, NUM_MONSTERS);
 
@@ -345,10 +336,19 @@ int main(void)
 				xOff = -(mapWidth - WIDTH);
 			}
 
+			//warunek zwyciestwa
+			if ((player.x + player.x + xOff) > 3000)
+			{
+				al_draw_bitmap(victory, 0, 0, 0);
+				al_flip_display();
+				al_rest(2.0);
+				done = true;
+			}
+
 			render = true;
 		}
 
-		// if od rysowania
+		/* R E N D E R O W A N I E */
 		if (render && al_is_event_queue_empty(event_queue))
 		{
 			render = false;
@@ -359,27 +359,30 @@ int main(void)
 			//rysuj mapę
 			for (int i = 0; i < sizeArrayMap; i++)
 			{
+				if (map[i] == 0 || map[i] == 1 || map[i] == 2 || map[i] == 3 || map[i] == 4)
 				al_draw_bitmap_region(bgTiles, tileSize * map[i], 0, tileSize, tileSize,
 					xOff + tileSize * (i % mapColumns), yOff + tileSize * (i / mapColumns), 0);
 
 				//skarby
-				switch (map[i])
+				if (map[i] == 5)
 				{
-					case 4:
-						al_draw_bitmap_region(gem1, curFrame * 50, 0, 50, 50,/*gdzie rysowac*/ xOff + tileSize * (i % mapColumns), yOff + tileSize * (i / mapColumns), 0);
-						break;
-					case 5:
-						al_draw_bitmap_region(gem2, curFrame * 50, 0, 50, 50,/*gdzie rysowac*/ xOff + tileSize * (i % mapColumns), yOff + tileSize * (i / mapColumns), 0);
-						break;
-					case 6:
-						al_draw_bitmap_region(gem3, curFrame * 50, 0, 50, 50,/*gdzie rysowac*/ xOff + tileSize * (i % mapColumns), yOff + tileSize * (i / mapColumns), 0);
-						break;
-					case 7:
-						al_draw_bitmap_region(gem4, curFrame * 50, 0, 50, 50,/*gdzie rysowac*/ xOff + tileSize * (i % mapColumns), yOff + tileSize * (i / mapColumns), 0);
-						break;
+					al_draw_bitmap_region(gem1, curFrame * 50, 0, 50, 50,/*gdzie rysowac*/ xOff + tileSize * (i % mapColumns), yOff + tileSize * (i / mapColumns), 0);
 				}
-			}
+				if (map[i] == 6)
+				{
+					al_draw_bitmap_region(gem2, curFrame * 50, 0, 50, 50,/*gdzie rysowac*/ xOff + tileSize * (i % mapColumns), yOff + tileSize * (i / mapColumns), 0);
+				}
+				if (map[i] == 7)
+				{
+					al_draw_bitmap_region(gem3, curFrame * 50, 0, 50, 50,/*gdzie rysowac*/ xOff + tileSize * (i % mapColumns), yOff + tileSize * (i / mapColumns), 0);
+				}
+				if (map[i] == 8)
+				{
+					al_draw_bitmap_region(gem4, curFrame * 50, 0, 50, 50,/*gdzie rysowac*/ xOff + tileSize * (i % mapColumns), yOff + tileSize * (i / mapColumns), 0);
+				}
 				
+			}
+			
 			//rysuj gracza
 			if (player.alive)
 			{
@@ -388,9 +391,7 @@ int main(void)
 				if (player.dir == -1)
 					al_draw_bitmap_region(player_l, curFrame * 70, 0, 70, 94,/*gdzie rysowac*/ player.x + xOff, player.y + yOff, 0);
 			}
-				//al_draw_bitmap(spritePlayer[curFrame], player.x + xOff, player.y + yOff, 0);
 				
-
 			//rysuj pociski
 			DrawBullet(bullets, NUM_BULLETS);
 			UpdateBullet(bullets, NUM_BULLETS, player);
